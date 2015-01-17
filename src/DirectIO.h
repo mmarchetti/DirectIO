@@ -78,9 +78,13 @@ template <u8 pin>
 class Output {
 	// An digital output with direct port I/O
     public:
-        Output() { 
+        Output(boolean initial_value=LOW) { 
             pinMode(pin, OUTPUT); 
-        }
+			
+			// include a call to digitalWrite here which will 
+			// turn off PWM on this pin, if needed
+			digitalWrite(pin, initial_value); 
+       }
         void write(boolean value) { 
             bitWrite(*port_t(_pins<pin>::out), _pins<pin>::bit, value); 
         }
@@ -138,71 +142,4 @@ class OutputPin {
 	
 	private:
 		const u8 pin;
-};
-
-template <u8 data_pin, u8 clock_pin, u8 nbits, class bits_t=u32, u8 bit_order=MSBFIRST> 
-class InputShifter {
-    public:
-        InputShifter(bool pullup=true) : data(pullup) {}
-        
-		bits_t read() {
-            bits_t value = 0;
-            bits_t mask = (bit_order == LSBFIRST) ? 1 : (bits_t(1) << (nbits - 1));
-            
-            for(u8 i = 0; i < nbits; i++) {
-                clock = HIGH;
-                
-                if(data) {
-                    value |= mask;
-                }
-                clock = LOW;
-                
-                if (bit_order == LSBFIRST) {
-                    mask <<= 1;
-                }
-                else {
-                    mask >>= 1;
-                }
-            }
-            return value;
-        }
-
-		operator bits_t() { 
-            return read(); 
-        }
-		
-	private:
-		Input<data_pin> data;
-		Output<clock_pin> clock;
-};
-
-template <u8 data_pin, u8 clock_pin, u8 nbits, class bits_t=u32, u8 bit_order=MSBFIRST> 
-class OutputShifter {
-    public:
-        OutputShifter() {};
-        
-        void write(bits_t val) {
-            bits_t mask = (bit_order == LSBFIRST) ? 1 : (bits_t(1) << (nbits - 1));
-            
-            for(u8 i = 0; i < nbits; i++) {
-                data = (val & mask);
-                clock.pulse();
-                
-                if (bit_order == LSBFIRST) {
-                    mask <<= 1;
-                }
-                else {
-                    mask >>= 1;
-                }
-            }
-        }
-
-        OutputShifter& operator = (bits_t val) { 
-            write(val); 
-            return *this; 
-        }
-        
-    private:
-		Output<data_pin> data;
-		Output<clock_pin> clock;
 };
