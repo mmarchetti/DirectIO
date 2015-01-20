@@ -28,6 +28,55 @@ The standard Arduino I/O library (Wiring) isn't particularly fast. There are sev
 
 ### API
 
+#### Include Files
+When you add the DirectIO library to your project, the Arduino IDE will add all of the include files:
+```C++
+#include <base.h>
+#include <DirectIO.h>
+#include <ports.h>
+```
+Remove `base.h` and `ports.h`, and just include `DirectIO.h`.
+
+#### For Arduino IDE 1.0 Users
+In order to map the pin numbers you specify into AVR ports, you need to tell the Direct IO library which Arduino board type you are using. If you are using Arduino IDE v1.5 or higher, the IDE will do this automatically based on the board selected in the Board menu. If you are using IDE 1.0, you will need to define which board you are using. For example, if you have an Uno board:
+```C++
+#define ARDUINO_AVR_UNO 1
+#include <DirectIO.h>
+```
+
+If you omit this step, you will see this compilation error:
+``` 
+error: #error "Unsupported Arduino variant. If you are using Arduino IDE 1.0, be sure to #define an Arduino variant (e.g. #define ARDUINO_AVR_UNO 1). See ports.h."
+```
+
+There are three supported Arduino variants:
+* Standard: 
+  * ARDUINO_AVR_UNO
+  * ARDUINO_AVR_YUN
+  * ARDUINO_AVR_DUEMILANOVE
+  * ARDUINO_AVR_NANO
+  * ARDUINO_AVR_MINI
+  * ARDUINO_AVR_ETHERNET
+  * ARDUINO_AVR_FIO
+  * ARDUINO_AVR_BT
+  * ARDUINO_AVR_LILYPAD
+  * ARDUINO_AVR_PRO
+  * ARDUINO_AVR_NG
+
+* Mega:
+  * ARDUINO_AVR_MEGA2560
+  * ARDUINO_AVR_ADK
+
+* Leonardo:
+  * ARDUINO_AVR_LEONARDO
+  * ARDUINO_AVR_MICRO
+  * ARDUINO_AVR_ESPLORA
+  * ARDUINO_AVR_LILYPAD_USB
+  * ARDUINO_AVR_ROBOT_MOTOR
+  * ARDUINO_AVR_ROBOT_CONTROL
+
+*Note, the Arduino Due (ARM platform) isn't supported yet.*
+
 #### Input
 
 Input is a class template; the template parameter is simply the pin number. You must specify a number that is known at compile time - a literal number, a number specified via `const u8 my_pin = ...`, or via `#define my_pin ...`.
