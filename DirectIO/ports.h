@@ -263,6 +263,10 @@ _define_pin(27, PORT_B, 5);
 _define_pin(28, PORT_B, 6);
 _define_pin(29, PORT_D, 6);
 
+#else
+
+#error "Unsupported Arduino variant. If you are using Arduino IDE 1.0, be sure to #define an Arduino variant (e.g. #define ARDUINO_AVR_UNO 1). See ports.h."
+
 #endif
 
 #undef _define_pin
