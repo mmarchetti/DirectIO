@@ -1,4 +1,5 @@
-#include <DirectIO_Shift.h>
+#include <DirectIO.h>
+#include "DirectIO_Shift.h"
 
 // define a shift register with data on pin 2 and clock on pin 3.
 // output size is 8 bits in this example.

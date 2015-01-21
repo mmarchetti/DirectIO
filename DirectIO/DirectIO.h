@@ -17,6 +17,9 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+#ifndef _DIRECTIO_H
+#define _DIRECTIO_H 1
+
 #include <ports.h>
 
 typedef volatile u8* port_t;
@@ -175,3 +178,5 @@ void OutputPin::write(boolean value)
 	}
 	SREG = oldSREG;
 }
+
+#endif // _DIRECTIO_H
