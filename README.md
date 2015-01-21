@@ -50,30 +50,36 @@ error: #error "Unsupported Arduino variant. If you are using Arduino IDE 1.0, be
 ```
 
 There are three supported Arduino variants:
-* Standard: 
-  * ARDUINO_AVR_UNO
-  * ARDUINO_AVR_YUN
-  * ARDUINO_AVR_DUEMILANOVE
-  * ARDUINO_AVR_NANO
-  * ARDUINO_AVR_MINI
-  * ARDUINO_AVR_ETHERNET
-  * ARDUINO_AVR_FIO
-  * ARDUINO_AVR_BT
-  * ARDUINO_AVR_LILYPAD
-  * ARDUINO_AVR_PRO
-  * ARDUINO_AVR_NG
+* Standard board variants:
+```
+	ARDUINO_AVR_UNO
+	ARDUINO_AVR_YUN
+	ARDUINO_AVR_DUEMILANOVE
+	ARDUINO_AVR_NANO
+	ARDUINO_AVR_MINI
+	ARDUINO_AVR_ETHERNET
+	ARDUINO_AVR_FIO
+	ARDUINO_AVR_BT
+	ARDUINO_AVR_LILYPAD
+	ARDUINO_AVR_PRO
+	ARDUINO_AVR_NG
+```
 
-* Mega:
-  * ARDUINO_AVR_MEGA2560
-  * ARDUINO_AVR_ADK
+* Mega board variants:
+```
+	ARDUINO_AVR_MEGA2560
+	ARDUINO_AVR_ADK
+```
 
-* Leonardo:
-  * ARDUINO_AVR_LEONARDO
-  * ARDUINO_AVR_MICRO
-  * ARDUINO_AVR_ESPLORA
-  * ARDUINO_AVR_LILYPAD_USB
-  * ARDUINO_AVR_ROBOT_MOTOR
-  * ARDUINO_AVR_ROBOT_CONTROL
+* Leonardo board variants:
+```
+	ARDUINO_AVR_LEONARDO
+	ARDUINO_AVR_MICRO
+	ARDUINO_AVR_ESPLORA
+	ARDUINO_AVR_LILYPAD_USB
+	ARDUINO_AVR_ROBOT_MOTOR
+	ARDUINO_AVR_ROBOT_CONTROL
+```
 
 *Note, the Arduino Due (ARM platform) isn't supported yet.*
 
@@ -192,7 +198,7 @@ boolean DoSomething(u8 pin)
 }
 ```
 
-Currently, `InputPin.read()` is a wrapper for digitalRead and shares its performance characteristics. This will change in a future version of the library.
+`InputPin` looks up and caches the port address and bit mask (using 3 bytes of RAM per instance), in order to boost performance over digitalRead.
 
 ##### OutputPin
 
@@ -204,7 +210,7 @@ void DoSomething(u8 pin)
 }
 ```
 
-Currently, `OutputPin.write()` is a wrapper for digitalWrite and shares its performance characteristics. This will change in a future version of the library.
+`OutputPin` looks up and caches the port address and bit mask (using 8 bytes of RAM per instance), in order to gain a 10x speedup over digitalWrite.
 
 ### Benchmark: Arduino I/O
 
@@ -258,11 +264,11 @@ Here's the same loop, using the DirectIO library:
 
 ```C++
 #include <DirectIO.h>  
-  
+
 Output<2> pin;  
-  
+
 void setup() {}  
-  
+
 void loop() {  
   while(1) {  
     pin = HIGH;  
@@ -300,3 +306,28 @@ gives an output frequency of 2.66 MHz - over 40x faster than the native
 Arduino I/O.
 
 ![Trace of Direct IO case](direct.png)
+
+### Benchmark: Direct I/O with Dynamic Pin Number
+
+One more time, using pin numbers specified at runtime. Note that you should only do this if you need dynamic pin numbering; if you have constant pin numbers, use the `Output` class described above.
+
+```C++
+#include <DirectIO.h>  
+
+OutputPin pin(2);  
+
+void setup() {}  
+
+void loop() {  
+  while(1) {  
+    pin = HIGH;  
+    pin = LOW;  
+  }  
+}  
+```
+
+Each pass through the loop takes 24 cycles; on a 16 Mhz board, this
+gives an output frequency of 666.7 KHz - over 10x faster than the native
+Arduino I/O.
+
+![Trace of Direct IO dynamic case](direct_pin.png)

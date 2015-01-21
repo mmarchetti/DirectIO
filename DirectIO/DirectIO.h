@@ -38,24 +38,21 @@ class Input {
 
 class InputPin {
 	// An digital input where the pin isn't known at compile time.
+	// We cache the port address and bit mask for the pin
+	// and read() reads directly from port memory.
     public:
-        InputPin(u8 pin, boolean pullup=true) : 
-            pin(pin) { 
-            pinMode(pin, pullup ? INPUT_PULLUP : INPUT); 
-        }
+        InputPin(u8 pin, boolean pullup=true);
 
-        // Performance could be faster here if we bypass digitalRead, for example
-        // by doing the lookup of the IO register and bit mask in the constructor
-        // and using them in read()... at the cost of 2 bytes of RAM.
         boolean read() { 
-            return digitalRead(pin); 
+            return *in_port & mask;
         }
         operator boolean() { 
             return read(); 
         }
 	
 	private:
-		const u8 pin;
+		port_t	in_port;
+		u8		mask;
 };
 
 template <u8 pin> 
@@ -85,7 +82,7 @@ class Output {
 			// turn off PWM on this pin, if needed
 			digitalWrite(pin, initial_value); 
        }
-        void write(boolean value) { 
+        void write(boolean value) {
             bitWrite(*port_t(_pins<pin>::out), _pins<pin>::bit, value); 
         }
         Output& operator =(boolean value) { 
@@ -109,18 +106,18 @@ class Output {
 
 class OutputPin {
 	// An digital output where the pin isn't known at compile time.
+	// We cache the port address and bit mask for the pin
+	// and write() writes directly to port memory.
     public:
-        OutputPin(u8 pin): 
-            pin(pin) { 
-            pinMode(pin, OUTPUT); 
-        }
+        OutputPin(u8 pin, boolean initial_value=LOW);
 
-        // Performance could be faster here if we bypass digitalRead/digitalWrite, 
-        // by doing the lookup of the IO register and bit mask in the constructor
-        // and using them in write()... at the cost of a few bytes of RAM.
-        
         void write(boolean value) { 
-            digitalWrite(pin, value); 
+			if(value) {
+				*out_port |= on_mask;
+			}
+			else {
+				*out_port &= off_mask;
+			}
         }
         OutputPin& operator =(boolean value) { 
             write(value); 
@@ -134,12 +131,15 @@ class OutputPin {
             write(! value); 
         }
         boolean read() { 
-            return digitalRead(pin); 
+            return *in_port & on_mask;
         }
         operator boolean() { 
             return read(); 
         }
 	
 	private:
-		const u8 pin;
+		port_t	in_port;
+		port_t	out_port;
+		u8		on_mask;
+		u8		off_mask;
 };
