@@ -210,7 +210,7 @@ void DoSomething(u8 pin)
 }
 ```
 
-`OutputPin` looks up and caches the port address and bit mask (using 8 bytes of RAM per instance), in order to gain a 10x speedup over digitalWrite.
+`OutputPin` looks up and caches the port address and bit mask (using 8 bytes of RAM per instance), in order to gain a 3x speedup over digitalWrite.
 
 ### Benchmark: Arduino I/O
 

@@ -271,4 +271,11 @@ _define_pin(29, PORT_D, 6);
 
 #undef _define_pin
 
+#undef _AVR_COMMON_H
+#undef _AVR_IO_H_
+#undef _AVR_SFR_DEFS_H_
+#undef _SFR_ASM_COMPAT
+#include <avr/io.h>
+#include <avr/common.h>
+
 #endif  // _PORTS_H
