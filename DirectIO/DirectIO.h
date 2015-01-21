@@ -177,4 +177,96 @@ void OutputPin::write(boolean value)
     }
 }
 
+template <class port, u8 start_bit=0, u8 nbits=8>
+class InputPort {
+	// A set of digital inputs which are contiguous and
+	// located in a single MCU I/O port. This abandons
+	// the pin number model for specifying I/O pins,
+	// in order to gain fast, simultaneous 
+	// multi-bit reads and writes.
+    public:
+		InputPort() {}
+		
+		u8 read() {
+			// mask to select bits of interest, then shift so
+			// that output can be treated as normal integers.
+			return (*port_t(port::in) & mask) >> start_bit; 
+		}
+		operator u8() { 
+			return read(); 
+		}
+		
+	private:
+		static const u8 mask = ((u8(1) << nbits) - 1) << start_bit;
+};
+
+template <class port, u8 start_bit=0, u8 nbits=8>
+class OutputPort {
+	// A set of digital outputs which are contiguous and
+	// located in a single MCU I/O port. This abandons
+	// the pin number model for specifying I/O pins,
+	// in order to gain fast, simultaneous 
+	// multi-bit reads and writes.
+    public:
+		OutputPort() {
+			// set port pin directions to output
+			atomic {
+				*port_t(port::dir) |= mask;
+			}
+		}
+		
+        void write(u8 value) {
+			atomic {
+				u8 v = *port_t(port::in);
+				u8 shifted = value << start_bit;
+				v |= shifted & mask;
+				v &= (shifted | ~mask);
+				*port_t(port::out) = v;
+			}
+        }
+        OutputPort& operator =(u8 value) { 
+            write(value); 
+            return *this; 
+        }
+		u8 read() {
+			// mask to select bits of interest, then shift so
+			// that output can be treated as normal integers.
+			return (*port_t(port::in) & mask) >> start_bit; 
+		}
+		operator u8() { 
+			return read(); 
+		}
+		
+	private:
+		static const u8 mask = ((u8(1) << nbits) - 1) << start_bit;
+};
+
+template <class port>
+class OutputPort<port, 0, 8> {
+	// Specialization for a complete MCU output port.
+	// This simplifies writes, which no longer require
+	// a read/modify write cycle. This reduces the
+	// bit manipulation required, and also eliminates
+	// the need to disable/reenable interrupts during writes.
+    public:
+		OutputPort() {
+			// set port pin directions to output
+			*port_t(port::dir) = 0xFF;
+		}
+		
+        void write(u8 value) {
+			*port_t(port::out) = value;
+        }
+        OutputPort& operator =(u8 value) { 
+            write(value); 
+            return *this; 
+        }
+		u8 read() {
+			return *port_t(port::in); 
+		}
+		operator u8() { 
+			return read(); 
+		}
+};
+
 #endif // _DIRECTIO_H

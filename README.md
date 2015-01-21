@@ -1,5 +1,30 @@
 
-## Why use DirectIO?
+### Contents
+* [Why use DirectIO?](#user-content-why-use-directio)
+* [Comparison](#user-content-comparison)
+* [Performance](#user-content-performance)
+* [API](#user-content-api)
+  * [Include Files](#user-content-include-files)
+  * [For Arduino IDE 1.0 Users](#user-content-for-arduino-ide-10-users)
+  * [Input](#user-content-input)
+  * [Output](#user-content-output)
+  * [Multi-Bit I/O](#user-content-multi-bit-io)
+    * [InputPort](#user-content-inputport)
+    * [OutputPort](#user-content-outputport)
+  * [Active Low Signals](#user-content-active-low-signals)
+    * [InputLow](#user-content-inputlow)
+    * [OutputLow](#user-content-outputlow)
+  * [Pin Numbers Determined at Runtime](#user-content-pin-numbers-determined-at-runtime)
+    * [InputPin](#user-content-inputpin)
+    * [OutputPin](#user-content-outputpin)
+* [Benchmarks](#user-content-benchmarks)
+  * [Arduino I/O](#user-content-arduino-io)
+  * [Direct I/O](#user-content-direct-io)
+  * [Direct I/O with Dynamic Pin Numbers](#user-content-direct-io-with-dynamic-pin-numbers)
+  * [8-Bit Port using Arduino I/O](#user-content-8-bit-port-using-arduino-io)
+  * [8-Bit Port using DirectIO](#user-content-8-bit-port-using-directio)
+
+### Why use DirectIO?
 Two reasons: 
 * Speed: writes are 40x to 60x faster than the Arduino libraries. Maximum output frequency is 2.66 MHz, vs 64 KHz for the Arduino libraries.
 * Simple API: just create pin objects. Assigning to a pin performs a write, using its value performs a read.
@@ -44,9 +69,9 @@ In order to map the pin numbers you specify into AVR ports, you need to tell the
 #include <DirectIO.h>
 ```
 
-If you omit this step, you will see this compilation error:
+If you omit this step, you will see a warning during compilation, and a standard Arduino board will be assumed:
 ``` 
-error: #error "Unsupported Arduino variant. If you are using Arduino IDE 1.0, be sure to #define an Arduino variant (e.g. #define ARDUINO_AVR_UNO 1). See ports.h."
+error: #warning "Unsupported Arduino variant. If you are using Arduino IDE 1.0, be sure to #define an Arduino variant (e.g. #define ARDUINO_AVR_UNO 1). See ports.h."
 ```
 
 There are three supported Arduino variants:
@@ -146,6 +171,66 @@ or
 my_output.pulse(LOW);			// set the output LOW then HIGH
 ```
 
+#### Multi-Bit I/O
+
+The Arduino standard library works hard to hide the implementation details of digital I/O, and presents a nicer API based on pin numbers. But there are advantages to breaking this model:
+* Speed: you can read or write up to 8 pins with a single instruction.
+* Simultaneity: all 8 pins are read or written simultaneously.
+
+The DirectIO library provides two classes (`InputPort` and `OutputPort`) that allow port-based I/O, mapping up to 8 bits to a single port object.
+
+1. Determine how many pins you need.
+2. Look at the pinout for your Arduino variant, and identify a set of pins that share a common port and are sequentially numbered in that port. Or, look at the pin definitions in `ports.h`.
+3. Wire your project using those pins.
+4. Define an `InputPort` or `OutputPort` object mapped to the selected port and pins. For example, support you are using a 4-bit port and have decided to use Port C2-C5 (in a standard Arduino sketch, these would be referred to as pins 16-19):
+
+```C++
+// Define a 4-bit port starting at port C2.
+// This will control C2, C3, C4, C5 (pins 16-19).
+OutputPort<PORT_C, 2, 4> my_port;
+
+// Turn on C2 (pin 16), and turn off the rest.
+my_port = 0x01;
+```
+
+
+##### InputPort
+
+InputPort is a class template that takes 3 parameters:
+* The port, as defined in `ports.h`. For example, `PORT_D`. Standard Arduinos use `PORT_D`, `PORT_B`, and `PORT_C`. Arduino Mega boards have ports up through `PORT_L`.
+* The starting pin number in the port (default 0)
+* The number of pins (default 8).
+
+```
+template <class port, u8 start_bit=0, u8 nbits=8> class InputPort { ... }
+```
+
+Like Input objects, InputPorts support reading values implicitly or explicitly:
+```
+InputPort<PORT_C, 2, 4> my_port;
+u8 value = my_port;           	// implicit call to read()
+u8 value2 = my_port.read();   	// or use an explicit call, if you prefer
+```
+
+For ports less than 8 bits wide, read() places the bits read from the port into the *n* low order bits of the returned value.
+
+##### OutputPort
+
+OutputPort is a class template. The parameters are the same as `InputPort`.
+
+```
+template <class port, u8 start_bit=0, u8 nbits=8> class OutputPort { ... }
+```
+
+Like Output objects, OutputPorts support writing values implicitly or explicitly:
+```
+OutputPort<PORT_C, 2, 4> my_port;
+my_output = 0x07;           	// implicit call to write()
+my_output.write(0x07);      	// or use an explicit call, if you prefer
+```
+
+For ports less than 8 bits wide, read() places the bits read from the port into the *n* low order bits of the returned value.
+
 #### Active Low Signals
 
 In some circuits, the meaning of inputs is reversed - for example, a switch input may be LOW when the switch is closed. This is an *active low* input. It can be helpful in program logic to consider LOW as true and HIGH as false. There are two classes that support active low signals.
@@ -212,7 +297,8 @@ void DoSomething(u8 pin)
 
 `OutputPin` looks up and caches the port address and bit mask (using 8 bytes of RAM per instance), in order to gain a 3x speedup over digitalWrite.
 
-### Benchmark: Arduino I/O
+### Benchmarks
+#### Arduino I/O
 
 Here's a short sketch that drives an output pin as fast as possible:  
   
@@ -256,9 +342,9 @@ In this loop, each write to the output requires 3 instructions to set up a call 
 
 Each pass through the loop takes 250 cycles. On a 16 Mhz board, this gives an output frequency of 64 KHz.
 
-![Trace of Arduino IO case](normal.png)
+![Trace of Arduino IO case](images/normal.png)
 
-### Benchmark: Direct I/O
+#### Direct I/O
 
 Here's the same loop, using the DirectIO library:
 
@@ -305,11 +391,11 @@ Each pass through the loop takes 6 cycles; on a 16 Mhz board, this
 gives an output frequency of 2.66 MHz - over 40x faster than the native
 Arduino I/O.
 
-![Trace of Direct IO case](direct.png)
+![Trace of Direct IO case](images/direct.png)
 
-### Benchmark: Direct I/O with Dynamic Pin Number
+#### Direct I/O with Dynamic Pin Numbers
 
-One more time, using pin numbers specified at runtime. Note that you should only do this if you need dynamic pin numbering; if you have constant pin numbers, use the `Output` class described above.
+One more example, using pin numbers specified at runtime. Note that you should only do this if you need dynamic pin numbering; if you have constant pin numbers, use the `Output` class described above.
 
 ```C++
 #include <DirectIO.h>  
@@ -330,4 +416,69 @@ Each pass through the loop takes 75 cycles; on a 16 Mhz board, this
 gives an output frequency of 214 KHz - over 3x faster than the native
 Arduino I/O.
 
-![Trace of Direct IO dynamic case](direct_pin.png)
+![Trace of Direct IO dynamic case](images/direct_pin.png)
+
+#### 8-Bit Port using Arduino I/O
+
+Here is an example sketch that writes a series of values to an 8-bit output port (on pins 0-7).
+
+```C++
+#define FIRST_PIN 0
+
+void setup() 
+{
+  for(u8 i = 0; i < 8; i++) {
+   pinMode(FIRST_PIN + i, OUTPUT);
+  }
+}
+
+void loop() {
+  u8 value = 0;
+  
+  while(1) {
+    for(u8 i = 0; i < 8; i++) {
+     digitalWrite(FIRST_PIN + 7 - i, bitRead(value, i));
+    }
+    value++;
+  }
+}
+```
+
+The low order bit is cycling at 8.36 KHz, so the loop is running at 16.7 KHz. This is due to the large number of calls to `digitalWrite`.
+
+![Trace of 8-bit Arduino port](images/normal_port.png)
+
+#### 8-Bit Port using DirectIO
+
+Here is the same example using DirectIO:
+```C++
+#include <DirectIO.h>
+
+OutputPort<PORT_D> port;
+
+void setup() {}
+
+void loop() {
+  u8 i = 0;
+  
+  while(1) {
+    port = i++;
+  }
+}
+```
+
+First, the code is more readable. Second, it runs faster. A *lot* faster.
+
+![Trace of 8-bit Arduino port](images/direct_port.png)
+
+The low order bit is cycling at 2 MHz, so the loop is executing at 4MHz. This is over 200x as fast as the native Arduino version. Looking at the disassembly reveals why:
+```
+0000012c <loop>:
+ 12c:	80 e0       	ldi	r24, 0x00	; 0
+ 12e:	8b b9       	out	0x0b, r24	; 11
+ 130:	8f 5f       	subi	r24, 0xFF	; 255
+ 132:	fd cf       	rjmp	.-6      	; 0x12e <loop+0x2>
+```
+
+It's a 3-instruction loop that takes 4 cycles per iteration. Most of that time is spent incrementing the counter and branching back to the top of the loop. Writing all 8 bits to the port is done by the `out` instruction and takes a single cycle.
+
