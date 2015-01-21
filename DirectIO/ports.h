@@ -278,4 +278,7 @@ _define_pin(29, PORT_D, 6);
 #include <avr/io.h>
 #include <avr/common.h>
 
+#include <util/atomic.h>
+#define atomic ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
+
 #endif  // _PORTS_H

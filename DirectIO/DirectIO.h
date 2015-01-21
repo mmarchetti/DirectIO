@@ -167,16 +167,14 @@ OutputPin::OutputPin(u8 pin, boolean initial_state):
 
 void OutputPin::write(boolean value) 
 { 
-	u8 oldSREG = SREG;
-	cli();
-	
-	if(value) {
-		*out_port |= on_mask;
-	}
-	else {
-		*out_port &= off_mask;
-	}
-	SREG = oldSREG;
+	atomic {
+        if(value) {
+            *out_port |= on_mask;
+        }
+        else {
+            *out_port &= off_mask;
+        }
+    }
 }
 
 #endif // _DIRECTIO_H
