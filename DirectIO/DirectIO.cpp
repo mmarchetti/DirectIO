@@ -25,3 +25,17 @@ OutputPin::OutputPin(u8 pin, boolean initial_state):
 	// on this pin, if needed.
 	digitalWrite(pin, initial_state);
 }
+
+void OutputPin::write(boolean value) 
+{ 
+	u8 oldSREG = *port_t(SREG);
+	cli();
+	
+	if(value) {
+		*out_port |= on_mask;
+	}
+	else {
+		*out_port &= off_mask;
+	}
+	*port_t(SREG) = oldSREG;
+}

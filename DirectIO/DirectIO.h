@@ -111,14 +111,7 @@ class OutputPin {
     public:
         OutputPin(u8 pin, boolean initial_value=LOW);
 
-        void write(boolean value) { 
-			if(value) {
-				*out_port |= on_mask;
-			}
-			else {
-				*out_port &= off_mask;
-			}
-        }
+        void write(boolean value);
         OutputPin& operator =(boolean value) { 
             write(value); 
             return *this; 

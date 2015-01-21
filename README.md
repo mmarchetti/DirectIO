@@ -13,7 +13,7 @@ The standard Arduino I/O library (Wiring) isn't particularly fast. There are sev
 | I/O port address and bit mask are read from program memory on every I/O operation | Port and bit mask are determined at compile time, based on the target board.
 | Since port addresses are loaded dynamically, indirect load instructions must be used. | Fast I/O instructions (`sbi` and `cbi`) are used by the compiler.
 | Because of indirect addressing, digitalWrite must use a multi-instruction read/modify/write sequence. Since this is not atomic, digitalWrite must turn off interrupts and save/restore the status register. | `sbi` and `cbi` instructions execute atomically, so writes don't need to disable interrupts.
-| digitalWrite checks/disables PWM on the pin, every time. | PWM on an output pin is disabled at initialization time.
+| digitalRead and digitalWrite check/disable PWM on the pin, on every I/O operation. | PWM on the pin is disabled at initialization time.
 
 ### Performance
 
@@ -326,8 +326,8 @@ void loop() {
 }  
 ```
 
-Each pass through the loop takes 24 cycles; on a 16 Mhz board, this
-gives an output frequency of 666.7 KHz - over 10x faster than the native
+Each pass through the loop takes 75 cycles; on a 16 Mhz board, this
+gives an output frequency of 214 KHz - over 3x faster than the native
 Arduino I/O.
 
 ![Trace of Direct IO dynamic case](direct_pin.png)
