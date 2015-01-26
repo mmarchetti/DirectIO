@@ -23,6 +23,7 @@
 #include <ports.h>
 
 typedef volatile u8* port_t;
+const u8 NO_PIN = 255;
 
 template <u8 pin> 
 class Input {
@@ -105,6 +106,25 @@ class Output {
         operator boolean() { 
             return read(); 
         }
+};
+
+template <> 
+class Output<NO_PIN> {
+	// This specialization of Output is used when a module supports
+	// an optional pin and that pin is not being used. For example,
+	// if a chip supports an Output Enable pin but it is wired
+	// permanently HIGH in the circuit, there won't be an actual
+	// output pin connected to it. In the software, we will use this
+	// type of Output which is basically a no-op.
+    public:
+        Output(boolean initial_value=LOW) {}
+        void write(boolean value) {}
+        Output& operator =(boolean value) { 
+            write(value); 
+            return *this; 
+        }
+        void toggle() {}
+        void pulse(boolean value=HIGH) {}
 };
 
 class OutputPin {

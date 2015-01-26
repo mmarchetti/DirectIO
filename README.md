@@ -26,7 +26,7 @@
 
 ### Why use DirectIO?
 Two reasons: 
-* Speed: writes are 40x to 60x faster than the Arduino libraries. Maximum output frequency is 2.66 MHz, vs 64 KHz for the Arduino libraries.
+* Speed: writes are 40x to 60x faster than the Arduino libraries. Maximum output frequency is 2.66 MHz, vs 64 KHz for the Arduino libraries. When reading or writing multiple I/O together, even greater performance gains are possible.
 * Simple API: just create pin objects. Assigning to a pin performs a write, using its value performs a read.
 
 ### Comparison
