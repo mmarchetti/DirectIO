@@ -106,7 +106,7 @@ class ShiftRegister595 {
 	// ShiftRegister595 models a serial-in parallel-out shift register
 	// such as the 74HC595 (or up to 4 of them connected in series).
 	// The process for putting values onto the output pins is:
-	// For each bit, put the bit onto the data pin and pulse the 
+	// For each bit, write the bit onto the data pin and pulse the 
 	// shift register clock (this is done by ClockedOutput).
 	// When all bits have been transferred, pulse the storage
 	// register clock to transfer all bits at once to the storage

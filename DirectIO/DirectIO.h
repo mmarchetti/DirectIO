@@ -125,6 +125,12 @@ class Output<NO_PIN> {
         }
         void toggle() {}
         void pulse(boolean value=HIGH) {}
+        boolean read() { 
+            return LOW;
+        }
+        operator boolean() { 
+            return read(); 
+        }
 };
 
 class OutputPin {
