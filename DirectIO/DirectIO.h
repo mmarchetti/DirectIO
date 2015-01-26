@@ -243,6 +243,7 @@ class OutputPort {
 		
         void write(u8 value) {
 			atomic {
+                // read-modify-write cycle
 				u8 v = *port_t(port::in);
 				u8 shifted = value << start_bit;
 				v |= shifted & mask;
@@ -271,7 +272,7 @@ template <class port>
 class OutputPort<port, 0, 8> {
 	// Specialization for a complete MCU output port.
 	// This simplifies writes, which no longer require
-	// a read/modify write cycle. This reduces the
+	// a read/modify/write cycle. This reduces the
 	// bit manipulation required, and also eliminates
 	// the need to disable/reenable interrupts during writes.
     public:
