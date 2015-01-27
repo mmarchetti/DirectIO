@@ -295,6 +295,7 @@ _define_pin(19, PORT_C, 5);
 
 #undef _AVR_COMMON_H
 #undef _AVR_IO_H_
+#undef _AVR_IOXXX_H_
 #undef _AVR_SFR_DEFS_H_
 #undef _SFR_ASM_COMPAT
 #include <avr/io.h>
