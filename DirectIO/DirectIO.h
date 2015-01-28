@@ -120,11 +120,11 @@ class Output<NO_PIN> {
         Output(boolean initial_value=LOW) {}
         void write(boolean value) {}
         Output& operator =(boolean value) { 
-            write(value); 
             return *this; 
         }
         void toggle() {}
         void pulse(boolean value=HIGH) {}
+        
         boolean read() { 
             return LOW;
         }
@@ -294,6 +294,88 @@ class OutputPort<port, 0, 8> {
 		operator u8() { 
 			return read(); 
 		}
+};
+
+template<u8 pin>
+class AnalogInput {
+    public:
+        AnalogInput() {}
+        
+        u16 read() {
+            return analogRead(pin);
+        }
+        
+        operator u16 () {
+            return read();
+        }
+};
+
+template<u8 pin>
+class AnalogOutput {
+    public:
+        AnalogOutput(u8 initial_value=0) {
+            write(initial_value);
+        }
+        
+        void write(u8 value) {
+            analogWrite(pin, value);
+        }
+        
+        AnalogOutput& operator = (u8 value) {
+            write(value);
+            return *this;
+        }
+};
+
+template<>
+class AnalogOutput<NO_PIN> {
+	// This specialization of AnalogOutput is used when a module supports
+	// an optional pin and that pin is not being used. For example,
+	// the sample LCD project includes a backlight pin which can optionally
+    // be driven with PWM. Alternatively, it could be wired to Vcc to keep
+    // the backlight fully on. In that case, we will use this
+	// type of AnalogOutput which is basically a no-op.
+    public:
+        AnalogOutput(u8 initial_value=0) {}
+        void write(u8 value) {}
+        
+        AnalogOutput& operator = (u8 value) {
+            return *this;
+        }
+};
+
+template<u8 pin>
+class AnalogOutputLow {
+    public:
+        AnalogOutputLow(u8 initial_value=0) {
+            write(initial_value);
+        }
+        
+        void write(u8 value) {
+            analogWrite(pin, 255 - value);
+        }
+        
+        AnalogOutputLow& operator = (u8 value) {
+            write(value);
+            return *this;
+        }
+};
+
+template<>
+class AnalogOutputLow<NO_PIN> {
+	// This specialization of AnalogOutputLow is used when a module supports
+	// an optional pin and that pin is not being used. For example,
+	// the sample LCD project includes a backlight pin which can optionally
+    // be driven with PWM. Alternatively, it could be wired to Vcc to keep
+    // the backlight fully on. In that case, we will use this
+	// type of AnalogOutputLow which is basically a no-op.
+    public:
+        AnalogOutputLow(u8 initial_value=0) {}
+        void write(u8 value) {}
+        
+        AnalogOutputLow& operator = (u8 value) {
+            return *this;
+        }
 };
 
 #endif // _DIRECTIO_H
