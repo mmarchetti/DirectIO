@@ -329,12 +329,12 @@ class AnalogOutput {
 
 template<>
 class AnalogOutput<NO_PIN> {
-	// This specialization of AnalogOutput is used when a module supports
-	// an optional pin and that pin is not being used. For example,
-	// the sample LCD project includes a backlight pin which can optionally
+    // This specialization of AnalogOutput is used when a module supports
+    // an optional pin and that pin is not being used. For example,
+    // the sample LCD project includes a backlight pin which can optionally
     // be driven with PWM. Alternatively, it could be wired to Vcc to keep
     // the backlight fully on. In that case, we will use this
-	// type of AnalogOutput which is basically a no-op.
+    // type of AnalogOutput which is basically a no-op.
     public:
         AnalogOutput(u8 initial_value=0) {}
         void write(u8 value) {}
@@ -363,12 +363,12 @@ class AnalogOutputLow {
 
 template<>
 class AnalogOutputLow<NO_PIN> {
-	// This specialization of AnalogOutputLow is used when a module supports
-	// an optional pin and that pin is not being used. For example,
-	// the sample LCD project includes a backlight pin which can optionally
+    // This specialization of AnalogOutputLow is used when a module supports
+    // an optional pin and that pin is not being used. For example,
+    // the sample LCD project includes a backlight pin which can optionally
     // be driven with PWM. Alternatively, it could be wired to Vcc to keep
     // the backlight fully on. In that case, we will use this
-	// type of AnalogOutputLow which is basically a no-op.
+    // type of AnalogOutputLow which is basically a no-op.
     public:
         AnalogOutputLow(u8 initial_value=0) {}
         void write(u8 value) {}
