@@ -75,6 +75,22 @@ class InputLow {
         Input<pin> input;
 };
 
+// This macro lets you temporarily set an output to a value, 
+// and toggling back at the end of the code block. For example:
+// 
+// Output<2> cs;
+// Output<3> data;
+// with(cs, LOW) {
+//     data = HIGH;
+// }
+// 
+// is equivalent to:
+// cs = LOW;
+// data = HIGH;
+// cs = HIGH;
+
+#define with(pin, val) for(boolean _loop_##pin=((pin=val),true);_loop_##pin; _loop_##pin=((pin=!val), false))
+
 template <u8 pin> 
 class Output {
 	// An digital output with direct port I/O
