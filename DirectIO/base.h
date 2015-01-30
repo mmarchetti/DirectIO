@@ -32,6 +32,12 @@ typedef int8_t  i8;
 typedef int16_t i16;
 typedef int32_t i32;
 
+// Define std C++ style "<<" operator for writing to output streams.
+template<class T> inline Print &operator << (Print& obj, T arg)
+{ 
+    obj.print(arg); return obj; 
+} 
+
 // bits_type(N) gives the smallest type that will hold N bits (0 <= N <= 32)
 #define bits_type(N) typename _nbits_t<N>::bits_t
 
