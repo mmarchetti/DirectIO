@@ -17,6 +17,8 @@
   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
+#ifndef _DirectIO_Base_
+
 #include <Arduino.h>
 
 #if ARDUINO >= 150
@@ -81,3 +83,4 @@ _nbits(31, u32);
 _nbits(32, u32);
 
 #undef _nbits
+#endif // _DirectIO_Base_
