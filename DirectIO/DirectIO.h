@@ -182,7 +182,7 @@ class OutputPin {
 		u8		off_mask;
 };
 
-InputPin::InputPin(u8 pin, boolean pullup) : 
+inline InputPin::InputPin(u8 pin, boolean pullup) : 
 	in_port(portInputRegister(digitalPinToPort(pin))),
 	mask(digitalPinToBitMask(pin))
 { 
@@ -193,7 +193,7 @@ InputPin::InputPin(u8 pin, boolean pullup) :
 	(void) digitalRead(pin);
 }
 
-OutputPin::OutputPin(u8 pin, boolean initial_state): 
+inline OutputPin::OutputPin(u8 pin, boolean initial_state): 
 	in_port(portInputRegister(digitalPinToPort(pin))),
 	out_port(portOutputRegister(digitalPinToPort(pin))),
 	on_mask(digitalPinToBitMask(pin)),
@@ -207,7 +207,7 @@ OutputPin::OutputPin(u8 pin, boolean initial_state):
 	digitalWrite(pin, initial_state);
 }
 
-void OutputPin::write(boolean value) 
+inline void OutputPin::write(boolean value) 
 { 
 	atomic {
         if(value) {
