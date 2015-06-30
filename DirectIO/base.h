@@ -18,6 +18,7 @@
 */
 
 #ifndef _DirectIO_Base_
+#define _DirectIO_Base_
 
 #include <Arduino.h>
 
