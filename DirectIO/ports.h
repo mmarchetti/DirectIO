@@ -20,6 +20,10 @@
 #ifndef _PORTS_H
 #define _PORTS_H 1
 
+#undef _AVR_COMMON_H
+#undef _AVR_IO_H_
+#undef _AVR_SFR_DEFS_H_
+
 // _SFR_ASM_COMPAT enables the port numbers (e.g. PORTA) to be plain integers so they can be used as template parameters.
 #define _SFR_ASM_COMPAT 1
 
