@@ -22,10 +22,13 @@
 
 #undef _AVR_COMMON_H
 #undef _AVR_IO_H_
+#undef _AVR_IOXXX_H_
 #undef _AVR_SFR_DEFS_H_
+#undef _SFR_ASM_COMPAT
 
 // _SFR_ASM_COMPAT enables the port numbers (e.g. PORTA) to be plain integers so they can be used as template parameters.
 #define _SFR_ASM_COMPAT 1
+#include <avr/io.h>
 
 #ifndef _AVR_EEPROM_H_
 // avr/eeprom.h isn't compatible with _SFR_ASM_COMPAT, so prevent its inclusion
@@ -107,7 +110,7 @@ template <u8 pin> struct _pins {};
 // Next we will create a template specialization for each defined pin number.
 // Each specialization will contain the constants for that pin.
 // To avoid a lot of repetitive code, we will define the specializations with a macro.
-// Also note that each pin inherits the port registers from the 
+// Also note that each pin inherits the port registers from the
 // corresponding port object (defined above).
 
 #define _define_pin(PIN, PORT, BIT) \
@@ -116,7 +119,7 @@ template <u8 pin> struct _pins {};
     }
 
 // Define the correct ports/pins based on the Arduino board selected.
-// Arduino IDE 1.5 defines these automatically; if you are using 1.0, you 
+// Arduino IDE 1.5 defines these automatically; if you are using 1.0, you
 // must define the correct symbol, e.g.:
 // #define ARDUINO_AVR_UNO 1
 // #include <direct_io.h>
@@ -234,7 +237,7 @@ _define_pin(69, PORT_K, 7);
 	defined(ARDUINO_AVR_ESPLORA) || \
 	defined(ARDUINO_AVR_LILYPAD_USB) || \
 	defined(ARDUINO_AVR_ROBOT_MOTOR) || \
-	defined(ARDUINO_AVR_ROBOT_CONTROL) 
+	defined(ARDUINO_AVR_ROBOT_CONTROL)
 
 _define_pin(0, PORT_D, 2);
 _define_pin(1, PORT_D, 3);
