@@ -124,6 +124,39 @@ class Output {
         }
 };
 
+template <u8 pin> 
+class OutputLow {
+	// An digital output with direct port I/O
+    public:
+        OutputLow(boolean initial_value=HIGH) { 
+            pinMode(pin, OUTPUT); 
+			
+			// include a call to digitalWrite here which will 
+			// turn off PWM on this pin, if needed
+			digitalWrite(pin, initial_value); 
+       }
+        void write(boolean value) {
+            bitWrite(*port_t(_pins<pin>::out), _pins<pin>::bit, !value); 
+        }
+        OutputLow& operator =(boolean value) { 
+            write(value); 
+            return *this; 
+        }
+        void toggle() { 
+            write(! read()); 
+        }
+        void pulse(boolean value=LOW) { 
+            write(value); 
+            write(! value); 
+        }
+        boolean read() { 
+            return !bitRead(*port_t(_pins<pin>::in), _pins<pin>::bit); 
+        }
+        operator boolean() { 
+            return read(); 
+        }
+};
+
 template <> 
 class Output<NO_PIN> {
 	// This specialization of Output is used when a module supports
