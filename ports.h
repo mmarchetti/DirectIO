@@ -126,16 +126,16 @@ template <u8 pin> struct _pins {};
 // The definitions below match what's defined in pins_arduino.h for each config.
 
 #if defined(ARDUINO_AVR_UNO) || \
-	defined(ARDUINO_AVR_YUN) || \
-	defined(ARDUINO_AVR_DUEMILANOVE) || \
-	defined(ARDUINO_AVR_NANO) || \
-	defined(ARDUINO_AVR_MINI) || \
-	defined(ARDUINO_AVR_ETHERNET) || \
-	defined(ARDUINO_AVR_FIO) || \
-	defined(ARDUINO_AVR_BT) || \
-	defined(ARDUINO_AVR_LILYPAD) || \
-	defined(ARDUINO_AVR_PRO) || \
-	defined(ARDUINO_AVR_NG)
+    defined(ARDUINO_AVR_YUN) || \
+    defined(ARDUINO_AVR_DUEMILANOVE) || \
+    defined(ARDUINO_AVR_NANO) || \
+    defined(ARDUINO_AVR_MINI) || \
+    defined(ARDUINO_AVR_ETHERNET) || \
+    defined(ARDUINO_AVR_FIO) || \
+    defined(ARDUINO_AVR_BT) || \
+    defined(ARDUINO_AVR_LILYPAD) || \
+    defined(ARDUINO_AVR_PRO) || \
+    defined(ARDUINO_AVR_NG)
 
 _define_pin(0, PORT_D, 0);
 _define_pin(1, PORT_D, 1);
@@ -159,7 +159,7 @@ _define_pin(18, PORT_C, 4);
 _define_pin(19, PORT_C, 5);
 
 #elif defined(ARDUINO_AVR_MEGA2560) || \
-	defined(ARDUINO_AVR_ADK)
+    defined(ARDUINO_AVR_ADK)
 
 _define_pin(0, PORT_E, 0);
 _define_pin(1, PORT_E, 1);
@@ -233,11 +233,11 @@ _define_pin(68, PORT_K, 6);
 _define_pin(69, PORT_K, 7);
 
 #elif defined(ARDUINO_AVR_LEONARDO) || \
-	defined(ARDUINO_AVR_MICRO) || \
-	defined(ARDUINO_AVR_ESPLORA) || \
-	defined(ARDUINO_AVR_LILYPAD_USB) || \
-	defined(ARDUINO_AVR_ROBOT_MOTOR) || \
-	defined(ARDUINO_AVR_ROBOT_CONTROL)
+    defined(ARDUINO_AVR_MICRO) || \
+    defined(ARDUINO_AVR_ESPLORA) || \
+    defined(ARDUINO_AVR_LILYPAD_USB) || \
+    defined(ARDUINO_AVR_ROBOT_MOTOR) || \
+    defined(ARDUINO_AVR_ROBOT_CONTROL)
 
 _define_pin(0, PORT_D, 2);
 _define_pin(1, PORT_D, 3);
