@@ -20,6 +20,12 @@
 #ifndef _PORTS_H
 #define _PORTS_H 1
 
+#if !defined(ARDUINO_ARCH_AVR)
+#warning "Unsupported Arduino variant - falling back to digitalRead and digitalWrite. If you are using Arduino IDE 1.0, be sure to #define an Arduino variant (e.g. #define ARDUINO_AVR_UNO 1). See ports.h."
+#define DIRECTIO_FALLBACK 1
+#include "base.h"
+#else
+
 #undef _AVR_COMMON_H
 #undef _AVR_IO_H_
 #undef _AVR_IOXXX_H_
@@ -34,7 +40,7 @@
 // avr/eeprom.h isn't compatible with _SFR_ASM_COMPAT, so prevent its inclusion
 #define _AVR_EEPROM_H_ 1
 
-#include <base.h>
+#include "base.h"
 #undef _SFR_ASM_COMPAT
 #undef _AVR_EEPROM_H_
 #endif // _AVR_EEPROM_H_
@@ -270,12 +276,6 @@ _define_pin(27, PORT_B, 5);
 _define_pin(28, PORT_B, 6);
 _define_pin(29, PORT_D, 6);
 
-#else
-
-#warning "Unsupported Arduino variant - falling back to digitalRead and digitalWrite. If you are using Arduino IDE 1.0, be sure to #define an Arduino variant (e.g. #define ARDUINO_AVR_UNO 1). See ports.h."
-
-#define DIRECTIO_FALLBACK 1
-
 #endif
 
 #undef _define_pin
@@ -290,5 +290,5 @@ _define_pin(29, PORT_D, 6);
 
 #include <util/atomic.h>
 #define atomic ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
-
+#endif // ARDUINO_ARCH_AVR
 #endif  // _PORTS_H
