@@ -141,60 +141,60 @@ template <u8 pin> struct _pins {};
     defined(ARDUINO_AVR_PRO) || \
     defined(ARDUINO_AVR_NG) || \
     defined(AVR_UNO_WIFI_DEV_ED)
-#include "boards/standard.h"
+#include "boards/avr/standard.h"
 
 #elif defined(ARDUINO_AVR_MEGA2560) || \
       defined(ARDUINO_AVR_MEGA) || \
       defined(ARDUINO_AVR_ADK)
-#include "boards/mega.h"
+#include "boards/avr/mega.h"
 
 #elif defined(ARDUINO_AVR_LEONARDO) || \
       defined(ARDUINO_AVR_LEONARDO_ETH) || \
       defined(ARDUINO_AVR_ESPLORA) || \
       defined(ARDUINO_AVR_LILYPAD_USB)
-#include "boards/leonardo.h"
+#include "boards/avr/leonardo.h"
 
 #elif defined(ARDUINO_AVR_MICRO)
-#include "boards/micro.h"
+#include "boards/avr/micro.h"
 
 #elif defined(ARDUINO_AVR_ROBOT_CONTROL)
-#include "boards/robot_control.h"
+#include "boards/avr/robot_control.h"
 
 #elif defined(ARDUINO_AVR_ROBOT_MOTOR)
-#include "boards/robot_motor.h"
+#include "boards/avr/robot_motor.h"
 
 #elif defined(ARDUINO_AVR_ETHERNET)
-#include "boards/ethernet.h"
+#include "boards/avr/ethernet.h"
 
 #elif defined(ARDUINO_AVR_GEMMA)
-#include "boards/gemma.h"
+#include "boards/avr/gemma.h"
 
 #elif defined(ARDUINO_AVR_YUN) || \
       defined(ARDUINO_AVR_YUNMINI) || \
       defined(ARDUINO_AVR_INDUSTRIAL101) || \
       defined(ARDUINO_AVR_LININO_ONE)
-#include "boards/yun.h"
+#include "boards/avr/yun.h"
 
 #elif defined(ARDUINO_AVR_ETHERNET)
-#include "boards/ethernet.h"
+#include "boards/avr/ethernet.h"
 
 #elif defined(ARDUINO_AVR_ETHERNET)
-#include "boards/ethernet.h"
+#include "boards/avr/ethernet.h"
 
 #elif defined(ARDUINO_AVR_CIRCUITPLAY)
-#include "boards/circuitplay32u4.h"
+#include "boards/avr/circuitplay32u4.h"
 
 #elif defined(ARDUINO_AVR_ATMEL_ATMEGA328P_XMINI)
-#include "boards/atmega328p-xmini.h"
+#include "boards/avr/atmega328p-xmini.h"
 
 #elif defined(ARDUINO_AVR_ATMEL_ATMEGA328PB_XMINI)
-#include "boards/atmega328pb-xmini.h"
+#include "boards/avr/atmega328pb-xmini.h"
 
 #elif defined(ARDUINO_AVR_ATMEL_ATMEGA168PB_XMINI)
-#include "boards/atmega168pb-xmini.h"
+#include "boards/avr/atmega168pb-xmini.h"
 
 #elif defined(ARDUINO_AVR_EMORO_2560)
-#include "boards/emoro_variants.h"
+#include "boards/avr/emoro_variants.h"
 
 #else
 #warning "Unsupported Arduino variant - falling back to digitalRead and digitalWrite. If you are using Arduino IDE 1.0, be sure to #define an Arduino variant (e.g. #define ARDUINO_AVR_UNO 1). See ports.h."

@@ -3,6 +3,7 @@ from __future__ import print_function
 
 from glob import glob
 from os.path import basename, dirname, exists, join
+import os
 import re
 import sys
 
@@ -107,8 +108,12 @@ def read_avr_variant(variant_file):
 	return list(enumerate(zip(ports, pins)))
 
 
-def generate_header(variant_name, pins):
-	filename = join('include', 'boards', variant_name + '.h')
+def generate_header(variant_name, variant_type, pins):
+	filename = join('include', 'boards', variant_type, variant_name + '.h')
+	try:
+		os.makedirs(dirname(filename))
+	except OSError:
+		pass
 
 	if pins:
 		with open(filename, 'w') as f:
@@ -140,7 +145,8 @@ def main(argv):
 
 	for path, pins in variants.items():
 		variant_name = basename(dirname(path))
-		generate_header(variant_name, pins)
+		variant_type = basename(dirname(dirname(dirname(dirname(path)))))
+		generate_header(variant_name, variant_type, pins)
 
 if __name__ == '__main__':
 	main(sys.argv)
