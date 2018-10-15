@@ -22,7 +22,6 @@
 
 #include "include/ports.h"
 
-typedef volatile u8* port_t;
 const u8 NO_PIN = 255;
 
 #ifndef DIRECTIO_FALLBACK
@@ -35,30 +34,11 @@ class Input {
             pinMode(pin, pullup ? INPUT_PULLUP : INPUT);
         }
         boolean read() {
-            return bitRead(*port_t(_pins<pin>::in), _pins<pin>::bit);
+            return _pins<pin>::input_read();
         }
         operator boolean() {
             return read();
         }
-};
-
-class InputPin {
-    // An digital input where the pin isn't known at compile time.
-    // We cache the port address and bit mask for the pin
-    // and read() reads directly from port memory.
-    public:
-        InputPin(u8 pin, boolean pullup=true);
-
-        boolean read() {
-            return *in_port & mask;
-        }
-        operator boolean() {
-            return read();
-        }
-
-    private:
-        port_t    in_port;
-        u8        mask;
 };
 
 template <u8 pin>
@@ -73,7 +53,7 @@ class Output {
             digitalWrite(pin, initial_value);
         }
         void write(boolean value) {
-            bitWrite(*port_t(_pins<pin>::out), _pins<pin>::bit, value);
+            _pins<pin>::output_write(value);
         }
         Output& operator =(boolean value) {
             write(value);
@@ -87,7 +67,7 @@ class Output {
             write(! value);
         }
         boolean read() {
-            return bitRead(*port_t(_pins<pin>::in), _pins<pin>::bit);
+            return _pins<pin>::output_read();
         }
         operator boolean() {
             return read();
@@ -106,7 +86,7 @@ class OutputLow {
             digitalWrite(pin, initial_value);
         }
         void write(boolean value) {
-            bitWrite(*port_t(_pins<pin>::out), _pins<pin>::bit, !value);
+            _pins<pin>::output_write(!value);
         }
         OutputLow& operator =(boolean value) {
             write(value);
@@ -120,11 +100,122 @@ class OutputLow {
             write(! value);
         }
         boolean read() {
-            return !bitRead(*port_t(_pins<pin>::in), _pins<pin>::bit);
+            return !_pins<pin>::output_read();
         }
         operator boolean() {
             return read();
         }
+};
+
+template <class port, u8 start_bit=0, u8 nbits=8>
+class InputPort {
+    // A set of digital inputs which are contiguous and
+    // located in a single MCU I/O port. This abandons
+    // the pin number model for specifying I/O pins,
+    // in order to gain fast, simultaneous
+    // multi-bit reads and writes.
+    public:
+        InputPort() {}
+
+        u8 read() {
+            // mask to select bits of interest, then shift so
+            // that output can be treated as normal integers.
+            return (*port_t(port::in) & mask) >> start_bit;
+        }
+        operator u8() {
+            return read();
+        }
+
+    private:
+        static const u8 mask = ((u8(1) << nbits) - 1) << start_bit;
+};
+
+template <class port, u8 start_bit=0, u8 nbits=8>
+class OutputPort {
+    // A set of digital outputs which are contiguous and
+    // located in a single MCU I/O port. This abandons
+    // the pin number model for specifying I/O pins,
+    // in order to gain fast, simultaneous
+    // multi-bit reads and writes.
+    public:
+        OutputPort() {
+            // set port pin directions to output
+            port::port_enable_outputs(mask);
+        }
+
+        void write(port_data_t value) {
+            atomic {
+                // read-modify-write cycle
+                port_data_t v = port::port_output_read();
+                port_data_t shifted = value << start_bit;
+                v |= shifted & mask;
+                v &= (shifted | ~mask);
+                port::port_output_write(v);
+            }
+        }
+        OutputPort& operator =(port_data_t value) {
+            write(value);
+            return *this;
+        }
+        port_data_t read() {
+            // mask to select bits of interest, then shift so
+            // that output can be treated as normal integers.
+            return (port::port_output_read() & mask) >> start_bit;
+        }
+        operator port_data_t() {
+            return read();
+        }
+
+    private:
+        static const port_data_t mask = ((port_data_t(1) << nbits) - 1) << start_bit;
+};
+
+template <class port>
+class OutputPort<port, 0, 8 * sizeof(port_data_t)> {
+    // Specialization for a complete MCU output port.
+    // This simplifies writes, which no longer require
+    // a read/modify/write cycle. This reduces the
+    // bit manipulation required, and also eliminates
+    // the need to disable/reenable interrupts during writes.
+    public:
+        OutputPort() {
+            // set port pin directions to output
+            port::port_enable_outputs(-1);
+        }
+
+        void write(u8 value) {
+            port::port_output_write(value);
+        }
+        OutputPort& operator =(u8 value) {
+            write(value);
+            return *this;
+        }
+        u8 read() {
+            return port::port_output_read();
+        }
+        operator u8() {
+            return read();
+        }
+};
+
+#if defined(ARDUINO_ARCH_AVR)
+class InputPin {
+    // An digital input where the pin isn't known at compile time.
+    // We cache the port address and bit mask for the pin
+    // and read() reads directly from port memory.
+    public:
+        InputPin(u8 pin, boolean pullup=true);
+
+        boolean read() {
+            return (*in_port & mask) != 0;
+        }
+        operator boolean() {
+            return read();
+        }
+
+    private:
+        port_t      in_port;
+        port_data_t mask;
 };
 
 class OutputPin {
@@ -147,17 +238,17 @@ class OutputPin {
             write(! value);
         }
         boolean read() {
-            return *in_port & on_mask;
+            return (*in_port & on_mask) != 0;
         }
         operator boolean() {
             return read();
         }
 
     private:
-        port_t    in_port;
-        port_t    out_port;
-        u8        on_mask;
-        u8        off_mask;
+        port_t       in_port;
+        port_t       out_port;
+        port_data_t  on_mask;
+        port_data_t  off_mask;
 };
 
 inline InputPin::InputPin(u8 pin, boolean pullup) :
@@ -196,100 +287,79 @@ inline void OutputPin::write(boolean value)
         }
     }
 }
-
-template <class port, u8 start_bit=0, u8 nbits=8>
-class InputPort {
-    // A set of digital inputs which are contiguous and
-    // located in a single MCU I/O port. This abandons
-    // the pin number model for specifying I/O pins,
-    // in order to gain fast, simultaneous
-    // multi-bit reads and writes.
+#else  // ARDUINO_ARCH_AVR
+class InputPin {
+    // An digital input where the pin isn't known at compile time.
+    // We cache the port address and bit mask for the pin
+    // and read() reads directly from port memory.
     public:
-        InputPort() {}
+        InputPin(u8 pin, boolean pullup=true);
 
-        u8 read() {
-            // mask to select bits of interest, then shift so
-            // that output can be treated as normal integers.
-            return (*port_t(port::in) & mask) >> start_bit;
+        boolean read() {
+            return digitalRead(pin);
         }
-        operator u8() {
+        operator boolean() {
             return read();
         }
 
     private:
-        static const u8 mask = ((u8(1) << nbits) - 1) << start_bit;
+        u8 pin;
 };
 
-template <class port, u8 start_bit=0, u8 nbits=8>
-class OutputPort {
-    // A set of digital outputs which are contiguous and
-    // located in a single MCU I/O port. This abandons
-    // the pin number model for specifying I/O pins,
-    // in order to gain fast, simultaneous
-    // multi-bit reads and writes.
+class OutputPin {
+    // An digital output where the pin isn't known at compile time.
+    // We cache the port address and bit mask for the pin
+    // and write() writes directly to port memory.
     public:
-        OutputPort() {
-            // set port pin directions to output
-            atomic {
-                *port_t(port::dir) |= mask;
-            }
-        }
+        OutputPin(u8 pin, boolean initial_value=LOW);
 
-        void write(u8 value) {
-            atomic {
-                // read-modify-write cycle
-                u8 v = *port_t(port::in);
-                u8 shifted = value << start_bit;
-                v |= shifted & mask;
-                v &= (shifted | ~mask);
-                *port_t(port::out) = v;
-            }
+        void write(boolean value) {
+            digitalWrite(pin, value);
         }
-        OutputPort& operator =(u8 value) {
+        OutputPin& operator =(boolean value) {
             write(value);
             return *this;
         }
-        u8 read() {
-            // mask to select bits of interest, then shift so
-            // that output can be treated as normal integers.
-            return (*port_t(port::in) & mask) >> start_bit;
+        void toggle() {
+            write(! read());
         }
-        operator u8() {
+        void pulse(boolean value=HIGH) {
+            write(value);
+            write(! value);
+        }
+        boolean read() {
+            return digitalRead(pin);
+        }
+        operator boolean() {
             return read();
         }
 
     private:
-        static const u8 mask = ((u8(1) << nbits) - 1) << start_bit;
+        u8 pin;
 };
 
-template <class port>
-class OutputPort<port, 0, 8> {
-    // Specialization for a complete MCU output port.
-    // This simplifies writes, which no longer require
-    // a read/modify/write cycle. This reduces the
-    // bit manipulation required, and also eliminates
-    // the need to disable/reenable interrupts during writes.
-    public:
-        OutputPort() {
-            // set port pin directions to output
-            *port_t(port::dir) = 0xFF;
-        }
+inline InputPin::InputPin(u8 pin, boolean pullup):
+    pin(pin)
+{
+    pinMode(pin, pullup ? INPUT_PULLUP : INPUT);
 
-        void write(u8 value) {
-            *port_t(port::out) = value;
-        }
-        OutputPort& operator =(u8 value) {
-            write(value);
-            return *this;
-        }
-        u8 read() {
-            return *port_t(port::in);
-        }
-        operator u8() {
-            return read();
-        }
-};
+    // include a call to digitalRead here which will
+    // turn off PWM on this pin, if needed
+    (void) digitalRead(pin);
+}
 
+inline OutputPin::OutputPin(u8 pin, boolean initial_state):
+    pin(pin)
+{
+    pinMode(pin, OUTPUT);
+
+    // include a call to digitalWrite here which will
+    // set the initial state and turn off PWM
+    // on this pin, if needed.
+    digitalWrite(pin, initial_state);
+}
+
+#endif  // ARDUINO_ARCH_AVR
 #else // DIRECTIO_FALLBACK
 
 // These classes offer compatilbity with alternate Arduino-compatible devices, so
