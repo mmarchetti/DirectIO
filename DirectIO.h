@@ -20,7 +20,7 @@
 #ifndef _DIRECTIO_H
 #define _DIRECTIO_H 1
 
-#include <ports.h>
+#include "include/ports.h"
 
 typedef volatile u8* port_t;
 const u8 NO_PIN = 255;
