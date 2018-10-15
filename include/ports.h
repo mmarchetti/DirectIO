@@ -20,11 +20,7 @@
 #ifndef _PORTS_H
 #define _PORTS_H 1
 
-#if !defined(ARDUINO_ARCH_AVR)
-#warning "Unsupported Arduino variant - falling back to digitalRead and digitalWrite. If you are using Arduino IDE 1.0, be sure to #define an Arduino variant (e.g. #define ARDUINO_AVR_UNO 1). See ports.h."
-#define DIRECTIO_FALLBACK 1
-#include "base.h"
-#else
+#if defined(ARDUINO_ARCH_AVR)
 
 #undef _AVR_COMMON_H
 #undef _AVR_IO_H_
@@ -46,7 +42,7 @@
 #endif // _AVR_EEPROM_H_
 
 // Define port description constants for all the ports defined in the AVR header file for this CPU.
-// See the header files in hardware/tools/avr/avr/include/avr/ for details.
+// See the header files in hardware/tools/avr/avr/avr/ for details.
 // Note, this relies on the fact that those headers use #define to define these constants.
 
 // The constants for each port will be defined in a unique struct.
@@ -128,158 +124,86 @@ template <u8 pin> struct _pins {};
 // Arduino IDE 1.5 defines these automatically; if you are using 1.0, you
 // must define the correct symbol, e.g.:
 // #define ARDUINO_AVR_UNO 1
-// #include <direct_io.h>
+// #include <DirectIO.h>
 // The definitions below match what's defined in pins_arduino.h for each config.
+#elif defined(ARDUINO_ARCH_SAM) || defined(ARDUINO_ARCH_SAMD)
+#include "base.h"
+// TODO: define SAM/SAMD version of _define_pin
+#endif
 
 #if defined(ARDUINO_AVR_UNO) || \
-    defined(ARDUINO_AVR_YUN) || \
     defined(ARDUINO_AVR_DUEMILANOVE) || \
     defined(ARDUINO_AVR_NANO) || \
     defined(ARDUINO_AVR_MINI) || \
-    defined(ARDUINO_AVR_ETHERNET) || \
     defined(ARDUINO_AVR_FIO) || \
     defined(ARDUINO_AVR_BT) || \
     defined(ARDUINO_AVR_LILYPAD) || \
     defined(ARDUINO_AVR_PRO) || \
-    defined(ARDUINO_AVR_NG)
-
-_define_pin(0, PORT_D, 0);
-_define_pin(1, PORT_D, 1);
-_define_pin(2, PORT_D, 2);
-_define_pin(3, PORT_D, 3);
-_define_pin(4, PORT_D, 4);
-_define_pin(5, PORT_D, 5);
-_define_pin(6, PORT_D, 6);
-_define_pin(7, PORT_D, 7);
-_define_pin(8, PORT_B, 0);
-_define_pin(9, PORT_B, 1);
-_define_pin(10, PORT_B, 2);
-_define_pin(11, PORT_B, 3);
-_define_pin(12, PORT_B, 4);
-_define_pin(13, PORT_B, 5);
-_define_pin(14, PORT_C, 0);
-_define_pin(15, PORT_C, 1);
-_define_pin(16, PORT_C, 2);
-_define_pin(17, PORT_C, 3);
-_define_pin(18, PORT_C, 4);
-_define_pin(19, PORT_C, 5);
+    defined(ARDUINO_AVR_NG) || \
+    defined(AVR_UNO_WIFI_DEV_ED)
+#include "boards/standard.h"
 
 #elif defined(ARDUINO_AVR_MEGA2560) || \
-    defined(ARDUINO_AVR_ADK)
-
-_define_pin(0, PORT_E, 0);
-_define_pin(1, PORT_E, 1);
-_define_pin(2, PORT_E, 4);
-_define_pin(3, PORT_E, 5);
-_define_pin(4, PORT_G, 5);
-_define_pin(5, PORT_E, 3);
-_define_pin(6, PORT_H, 3);
-_define_pin(7, PORT_H, 4);
-_define_pin(8, PORT_H, 5);
-_define_pin(9, PORT_H, 6);
-_define_pin(10, PORT_B, 4);
-_define_pin(11, PORT_B, 5);
-_define_pin(12, PORT_B, 6);
-_define_pin(13, PORT_B, 7);
-_define_pin(14, PORT_J, 1);
-_define_pin(15, PORT_J, 0);
-_define_pin(16, PORT_H, 1);
-_define_pin(17, PORT_H, 0);
-_define_pin(18, PORT_D, 3);
-_define_pin(19, PORT_D, 2);
-_define_pin(20, PORT_D, 1);
-_define_pin(21, PORT_D, 0);
-_define_pin(22, PORT_A, 0);
-_define_pin(23, PORT_A, 1);
-_define_pin(24, PORT_A, 2);
-_define_pin(25, PORT_A, 3);
-_define_pin(26, PORT_A, 4);
-_define_pin(27, PORT_A, 5);
-_define_pin(28, PORT_A, 6);
-_define_pin(29, PORT_A, 7);
-_define_pin(30, PORT_C, 7);
-_define_pin(31, PORT_C, 6);
-_define_pin(32, PORT_C, 5);
-_define_pin(33, PORT_C, 4);
-_define_pin(34, PORT_C, 3);
-_define_pin(35, PORT_C, 2);
-_define_pin(36, PORT_C, 1);
-_define_pin(37, PORT_C, 0);
-_define_pin(38, PORT_D, 7);
-_define_pin(39, PORT_G, 2);
-_define_pin(40, PORT_G, 1);
-_define_pin(41, PORT_G, 0);
-_define_pin(42, PORT_L, 7);
-_define_pin(43, PORT_L, 6);
-_define_pin(44, PORT_L, 5);
-_define_pin(45, PORT_L, 4);
-_define_pin(46, PORT_L, 3);
-_define_pin(47, PORT_L, 2);
-_define_pin(48, PORT_L, 1);
-_define_pin(49, PORT_L, 0);
-_define_pin(50, PORT_B, 3);
-_define_pin(51, PORT_B, 2);
-_define_pin(52, PORT_B, 1);
-_define_pin(53, PORT_B, 0);
-_define_pin(54, PORT_F, 0);
-_define_pin(55, PORT_F, 1);
-_define_pin(56, PORT_F, 2);
-_define_pin(57, PORT_F, 3);
-_define_pin(58, PORT_F, 4);
-_define_pin(59, PORT_F, 5);
-_define_pin(60, PORT_F, 6);
-_define_pin(61, PORT_F, 7);
-_define_pin(62, PORT_K, 0);
-_define_pin(63, PORT_K, 1);
-_define_pin(64, PORT_K, 2);
-_define_pin(65, PORT_K, 3);
-_define_pin(66, PORT_K, 4);
-_define_pin(67, PORT_K, 5);
-_define_pin(68, PORT_K, 6);
-_define_pin(69, PORT_K, 7);
+      defined(ARDUINO_AVR_MEGA) || \
+      defined(ARDUINO_AVR_ADK)
+#include "boards/mega.h"
 
 #elif defined(ARDUINO_AVR_LEONARDO) || \
-    defined(ARDUINO_AVR_MICRO) || \
-    defined(ARDUINO_AVR_ESPLORA) || \
-    defined(ARDUINO_AVR_LILYPAD_USB) || \
-    defined(ARDUINO_AVR_ROBOT_MOTOR) || \
-    defined(ARDUINO_AVR_ROBOT_CONTROL)
+      defined(ARDUINO_AVR_LEONARDO_ETH) || \
+      defined(ARDUINO_AVR_ESPLORA) || \
+      defined(ARDUINO_AVR_LILYPAD_USB)
+#include "boards/leonardo.h"
 
-_define_pin(0, PORT_D, 2);
-_define_pin(1, PORT_D, 3);
-_define_pin(2, PORT_D, 1);
-_define_pin(3, PORT_D, 0);
-_define_pin(4, PORT_D, 4);
-_define_pin(5, PORT_C, 6);
-_define_pin(6, PORT_D, 7);
-_define_pin(7, PORT_E, 6);
-_define_pin(8, PORT_B, 4);
-_define_pin(9, PORT_B, 5);
-_define_pin(10, PORT_B, 6);
-_define_pin(11, PORT_B, 7);
-_define_pin(12, PORT_D, 6);
-_define_pin(13, PORT_C, 7);
-_define_pin(14, PORT_B, 3);
-_define_pin(15, PORT_B, 1);
-_define_pin(16, PORT_B, 2);
-_define_pin(17, PORT_B, 0);
-_define_pin(18, PORT_F, 7);
-_define_pin(19, PORT_F, 6);
-_define_pin(20, PORT_F, 5);
-_define_pin(21, PORT_F, 4);
-_define_pin(22, PORT_F, 1);
-_define_pin(23, PORT_F, 0);
-_define_pin(24, PORT_D, 4);
-_define_pin(25, PORT_D, 7);
-_define_pin(26, PORT_B, 4);
-_define_pin(27, PORT_B, 5);
-_define_pin(28, PORT_B, 6);
-_define_pin(29, PORT_D, 6);
+#elif defined(ARDUINO_AVR_MICRO)
+#include "boards/micro.h"
 
+#elif defined(ARDUINO_AVR_ROBOT_CONTROL)
+#include "boards/robot_control.h"
+
+#elif defined(ARDUINO_AVR_ROBOT_MOTOR)
+#include "boards/robot_motor.h"
+
+#elif defined(ARDUINO_AVR_ETHERNET)
+#include "boards/ethernet.h"
+
+#elif defined(ARDUINO_AVR_GEMMA)
+#include "boards/gemma.h"
+
+#elif defined(ARDUINO_AVR_YUN) || \
+      defined(ARDUINO_AVR_YUNMINI) || \
+      defined(ARDUINO_AVR_INDUSTRIAL101) || \
+      defined(ARDUINO_AVR_LININO_ONE)
+#include "boards/yun.h"
+
+#elif defined(ARDUINO_AVR_ETHERNET)
+#include "boards/ethernet.h"
+
+#elif defined(ARDUINO_AVR_ETHERNET)
+#include "boards/ethernet.h"
+
+#elif defined(ARDUINO_AVR_CIRCUITPLAY)
+#include "boards/circuitplay32u4.h"
+
+#elif defined(ARDUINO_AVR_ATMEL_ATMEGA328P_XMINI)
+#include "boards/atmega328p-xmini.h"
+
+#elif defined(ARDUINO_AVR_ATMEL_ATMEGA328PB_XMINI)
+#include "boards/atmega328pb-xmini.h"
+
+#elif defined(ARDUINO_AVR_ATMEL_ATMEGA168PB_XMINI)
+#include "boards/atmega168pb-xmini.h"
+
+#elif defined(ARDUINO_AVR_EMORO_2560)
+#include "boards/emoro_variants.h"
+
+#else
+#warning "Unsupported Arduino variant - falling back to digitalRead and digitalWrite. If you are using Arduino IDE 1.0, be sure to #define an Arduino variant (e.g. #define ARDUINO_AVR_UNO 1). See ports.h."
+#define DIRECTIO_FALLBACK 1
 #endif
 
 #undef _define_pin
 
+#if defined(ARDUINO_ARCH_AVR)
 #undef _AVR_COMMON_H
 #undef _AVR_IO_H_
 #undef _AVR_IOXXX_H_
@@ -290,5 +214,5 @@ _define_pin(29, PORT_D, 6);
 
 #include <util/atomic.h>
 #define atomic ATOMIC_BLOCK(ATOMIC_RESTORESTATE)
-#endif // ARDUINO_ARCH_AVR
+#endif  // ARDUINO_ARCH_AVR
 #endif  // _PORTS_H
