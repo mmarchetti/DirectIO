@@ -23,8 +23,10 @@
 #include "include/ports.h"
 
 const u8 NO_PIN = 255;
+#include "include/pin.h"
+#include "include/analog.h"
 
-#ifndef DIRECTIO_FALLBACK
+#if !defined(DIRECTIO_FALLBACK)
 
 template <u8 pin>
 class Input {
@@ -115,7 +117,14 @@ class InputPort {
     // in order to gain fast, simultaneous
     // multi-bit reads and writes.
     public:
-        InputPort() {}
+        InputPort() {
+            setup();
+        }
+
+        void setup() {
+            // set port pin directions to output
+            port::port_enable_inputs(mask);
+        }
 
         u8 read() {
             // mask to select bits of interest, then shift so
@@ -139,6 +148,10 @@ class OutputPort {
     // multi-bit reads and writes.
     public:
         OutputPort() {
+            setup();
+        }
+
+        void setup() {
             // set port pin directions to output
             port::port_enable_outputs(mask);
         }
@@ -179,6 +192,10 @@ class OutputPort<port, 0, 8 * sizeof(port_data_t)> {
     // the need to disable/reenable interrupts during writes.
     public:
         OutputPort() {
+            setup();
+        }
+
+        void setup() {
             // set port pin directions to output
             port::port_enable_outputs(-1);
         }
@@ -198,168 +215,6 @@ class OutputPort<port, 0, 8 * sizeof(port_data_t)> {
         }
 };
 
-#if defined(ARDUINO_ARCH_AVR)
-class InputPin {
-    // An digital input where the pin isn't known at compile time.
-    // We cache the port address and bit mask for the pin
-    // and read() reads directly from port memory.
-    public:
-        InputPin(u8 pin, boolean pullup=true);
-
-        boolean read() {
-            return (*in_port & mask) != 0;
-        }
-        operator boolean() {
-            return read();
-        }
-
-    private:
-        port_t      in_port;
-        port_data_t mask;
-};
-
-class OutputPin {
-    // An digital output where the pin isn't known at compile time.
-    // We cache the port address and bit mask for the pin
-    // and write() writes directly to port memory.
-    public:
-        OutputPin(u8 pin, boolean initial_value=LOW);
-
-        void write(boolean value);
-        OutputPin& operator =(boolean value) {
-            write(value);
-            return *this;
-        }
-        void toggle() {
-            write(! read());
-        }
-        void pulse(boolean value=HIGH) {
-            write(value);
-            write(! value);
-        }
-        boolean read() {
-            return (*in_port & on_mask) != 0;
-        }
-        operator boolean() {
-            return read();
-        }
-
-    private:
-        port_t       in_port;
-        port_t       out_port;
-        port_data_t  on_mask;
-        port_data_t  off_mask;
-};
-
-inline InputPin::InputPin(u8 pin, boolean pullup) :
-    in_port(portInputRegister(digitalPinToPort(pin))),
-    mask(digitalPinToBitMask(pin))
-{
-    pinMode(pin, pullup ? INPUT_PULLUP : INPUT);
-
-    // include a call to digitalRead here which will
-    // turn off PWM on this pin, if needed
-    (void) digitalRead(pin);
-}
-
-inline OutputPin::OutputPin(u8 pin, boolean initial_state):
-    in_port(portInputRegister(digitalPinToPort(pin))),
-    out_port(portOutputRegister(digitalPinToPort(pin))),
-    on_mask(digitalPinToBitMask(pin)),
-    off_mask(~on_mask)
-{
-    pinMode(pin, OUTPUT);
-
-    // include a call to digitalWrite here which will
-    // set the initial state and turn off PWM
-    // on this pin, if needed.
-    digitalWrite(pin, initial_state);
-}
-
-inline void OutputPin::write(boolean value)
-{
-    atomic {
-        if(value) {
-            *out_port |= on_mask;
-        }
-        else {
-            *out_port &= off_mask;
-        }
-    }
-}
-#else  // ARDUINO_ARCH_AVR
-class InputPin {
-    // An digital input where the pin isn't known at compile time.
-    // We cache the port address and bit mask for the pin
-    // and read() reads directly from port memory.
-    public:
-        InputPin(u8 pin, boolean pullup=true);
-
-        boolean read() {
-            return digitalRead(pin);
-        }
-        operator boolean() {
-            return read();
-        }
-
-    private:
-        u8 pin;
-};
-
-class OutputPin {
-    // An digital output where the pin isn't known at compile time.
-    // We cache the port address and bit mask for the pin
-    // and write() writes directly to port memory.
-    public:
-        OutputPin(u8 pin, boolean initial_value=LOW);
-
-        void write(boolean value) {
-            digitalWrite(pin, value);
-        }
-        OutputPin& operator =(boolean value) {
-            write(value);
-            return *this;
-        }
-        void toggle() {
-            write(! read());
-        }
-        void pulse(boolean value=HIGH) {
-            write(value);
-            write(! value);
-        }
-        boolean read() {
-            return digitalRead(pin);
-        }
-        operator boolean() {
-            return read();
-        }
-
-    private:
-        u8 pin;
-};
-
-inline InputPin::InputPin(u8 pin, boolean pullup):
-    pin(pin)
-{
-    pinMode(pin, pullup ? INPUT_PULLUP : INPUT);
-
-    // include a call to digitalRead here which will
-    // turn off PWM on this pin, if needed
-    (void) digitalRead(pin);
-}
-
-inline OutputPin::OutputPin(u8 pin, boolean initial_state):
-    pin(pin)
-{
-    pinMode(pin, OUTPUT);
-
-    // include a call to digitalWrite here which will
-    // set the initial state and turn off PWM
-    // on this pin, if needed.
-    digitalWrite(pin, initial_state);
-}
-
-#endif  // ARDUINO_ARCH_AVR
 #else // DIRECTIO_FALLBACK
 
 // These classes offer compatilbity with alternate Arduino-compatible devices, so
@@ -379,22 +234,6 @@ class Input {
         operator boolean() {
             return read();
         }
-};
-
-class InputPin {
-    // An digital input where the pin isn't known at compile time.
-    public:
-        InputPin(u8 pin, boolean pullup=true);
-
-        boolean read() {
-            return digitalRead(pin);
-        }
-        operator boolean() {
-            return read();
-        }
-
-    private:
-        u8 pin;
 };
 
 template <u8 pin>
@@ -457,58 +296,7 @@ class OutputLow {
         }
 };
 
-class OutputPin {
-    // An digital output where the pin isn't known at compile time.
-    // We cache the port address and bit mask for the pin
-    // and write() writes directly to port memory.
-    public:
-        OutputPin(u8 pin, boolean initial_value=LOW);
-
-        void write(boolean value) {
-            digitalWrite(pin, !value);
-        }
-        OutputPin& operator =(boolean value) {
-            write(value);
-            return *this;
-        }
-        void toggle() {
-            write(! read());
-        }
-        void pulse(boolean value=HIGH) {
-            write(value);
-            write(! value);
-        }
-        boolean read() {
-            return digitalRead(pin);
-        }
-        operator boolean() {
-            return read();
-        }
-
-    private:
-        u8 pin;
-};
-
-inline InputPin::InputPin(u8 pin, boolean pullup) :
-    pin(pin)
-{
-    pinMode(pin, pullup ? INPUT_PULLUP : INPUT);
-
-    // include a call to digitalRead here which will
-    // turn off PWM on this pin, if needed
-    (void) digitalRead(pin);
-}
-
-inline OutputPin::OutputPin(u8 pin, boolean initial_state):
-    pin(pin)
-{
-    pinMode(pin, OUTPUT);
-
-    // include a call to digitalWrite here which will
-    // set the initial state and turn off PWM
-    // on this pin, if needed.
-    digitalWrite(pin, initial_state);
-}
+// TODO: fallbacks for InputPort and OutputPort
 
 #endif // DIRECTIO_FALLBACK
 
@@ -527,7 +315,6 @@ class InputLow {
     private:
         Input<pin> input;
 };
-
 
 // This macro lets you temporarily set an output to a value,
 // and toggling back at the end of the code block. For example:
@@ -567,86 +354,6 @@ class Output<NO_PIN> {
         }
         operator boolean() {
             return read();
-        }
-};
-
-
-template<u8 pin>
-class AnalogInput {
-    public:
-        AnalogInput() {}
-
-        u16 read() {
-            return analogRead(pin);
-        }
-
-        operator u16 () {
-            return read();
-        }
-};
-
-template<u8 pin>
-class AnalogOutput {
-    public:
-        AnalogOutput(u8 initial_value=0) {
-            write(initial_value);
-        }
-
-        void write(u8 value) {
-            analogWrite(pin, value);
-        }
-
-        AnalogOutput& operator = (u8 value) {
-            write(value);
-            return *this;
-        }
-};
-
-template<>
-class AnalogOutput<NO_PIN> {
-    // This specialization of AnalogOutput is used when a module supports
-    // an optional pin and that pin is not being used. For example,
-    // the sample LCD project includes a backlight pin which can optionally
-    // be driven with PWM. Alternatively, it could be wired to Vcc to keep
-    // the backlight fully on. In that case, we will use this
-    // type of AnalogOutput which is basically a no-op.
-    public:
-        AnalogOutput(u8 initial_value=0) {}
-        void write(u8 value) {}
-
-        AnalogOutput& operator = (u8 value) {
-            return *this;
-        }
-};
-
-template<u8 pin>
-class AnalogOutputLow {
-    public:
-        AnalogOutputLow(u8 initial_value=0) {
-            write(initial_value);
-        }
-
-        void write(u8 value) {
-            analogWrite(pin, 255 - value);
-        }
-
-        AnalogOutputLow& operator = (u8 value) {
-            write(value);
-            return *this;
-        }
-};
-
-template<>
-class AnalogOutputLow<NO_PIN> {
-    // This specialization of AnalogOutputLow is used when a module supports
-    // an optional pin and that pin is not being used.
-    // See AnalogOutput<NO_PIN> for details.
-    public:
-        AnalogOutputLow(u8 initial_value=0) {}
-        void write(u8 value) {}
-
-        AnalogOutputLow& operator = (u8 value) {
-            return *this;
         }
 };
 

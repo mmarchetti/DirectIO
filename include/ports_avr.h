@@ -57,6 +57,7 @@ typedef volatile port_data_t* port_t;
         static inline void port_output_write(u8 value) { *port_t(out) = value; } \
         static inline u8 port_output_read() { return *port_t(in); } \
         static inline void port_enable_outputs(u8 mask) { *port_t(dir) |= mask; } \
+        static inline void port_enable_inputs(u8 mask) { *port_t(dir) &= ~mask; } \
     }
 
 #ifdef PINA

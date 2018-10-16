@@ -1,5 +1,5 @@
 /*
-  ports_sam.h - SAM board support for DirectIO and other libraries.
+  ports_sams.h - SAMD board support for DirectIO and other libraries.
   Copyright (c) 2015-2018 Michael Marchetti.  All right reserved.
 
   This library is free software; you can redistribute it and/or
@@ -18,38 +18,36 @@
 */
 
 
-#ifndef _PORTS_SAM_H
-#define _PORTS_SAM_H 1
+#ifndef _PORTS_SAMD_H
+#define _PORTS_SAMD_H 1
 
 typedef u32 port_data_t;
 typedef volatile port_data_t* port_t;
 
-#define _define_port(NAME, PIO) \
+#define _define_port(NAME, PORTNUM) \
     struct NAME { \
-        static const u32 pio = u32(PIO); \
-        static inline u32 port_input_read() { return ((Pio*)pio)->PIO_PDSR; } \
-        static inline void port_output_write(u32 value) { \
-            ((Pio*)pio)->PIO_ODSR = value; \
-        } \
-        static inline u32 port_output_read() { return ((Pio*)pio)->PIO_ODSR; } \
-        static inline void port_enable_outputs(u32 mask) { PIO_Configure((Pio*)pio, PIO_OUTPUT_0, mask, PIO_DEFAULT); } \
-        static inline void port_enable_inputs(u32 mask) { PIO_Configure((Pio*)pio, PIO_INPUT, mask, PIO_DEFAULT); } \
+        static const u32 port = u32(&(REG_PORT_DIR##PORTNUM)); \
+        static inline u32 port_input_read() { return ((PortGroup*)port)->IN.reg; } \
+        static inline void port_output_write(u32 value) { ((PortGroup*)port)->OUT.reg = value; } \
+        static inline u32 port_output_read() { return ((PortGroup*)port)->OUT.reg; } \
+        static inline void port_enable_outputs(u32 mask) { ((PortGroup*)port)->DIRSET.reg = mask; } \
+        static inline void port_enable_inputs(u32 mask) { ((PortGroup*)port)->DIRCLR.reg = mask; } \
     }
 
-#ifdef PIOA
-_define_port(PORT_A, PIOA);
+#ifdef REG_PORT_DIR0
+_define_port(PORT_A, 0);
 #endif
 
-#ifdef PIOB
-_define_port(PORT_B, PIOB);
+#ifdef REG_PORT_DIR1
+_define_port(PORT_B, 1);
 #endif
 
-#ifdef PIOC
-_define_port(PORT_C, PIOC);
+#ifdef REG_PORT_DIR2
+_define_port(PORT_C, 2);
 #endif
 
-#ifdef PIOD
-_define_port(PORT_D, PIOD);
+#ifdef REG_PORT_DIR3
+_define_port(PORT_D, 3);
 #endif
 
 // These constants are propagated in a template-friendly way by using (what else? :) templates.
@@ -70,9 +68,9 @@ template <u8 pin> struct _pins {};
         static inline boolean input_read() { return PORT::port_input_read() & mask != 0; } \
         static inline boolean output_write(boolean value) { \
             if(value) { \
-                ((Pio*)PORT::pio)->PIO_SODR = mask; \
+               ((PortGroup*)port)->OUTSET.reg = mask; \
             } else { \
-                ((Pio*)PORT::pio)->PIO_CODR = mask; \
+                 ((PortGroup*)port)->OUTCLR.reg = mask; \
             } \
         } \
         static inline boolean output_read() { return PORT::port_output_read() & mask != 0; } \
@@ -80,11 +78,29 @@ template <u8 pin> struct _pins {};
 
 #define atomic for(boolean _loop_=(__disable_irq(),true);_loop_; _loop_=(__enable_irq(), false))
 
-#if defined(ARDUINO_SAM_DUE)
-#include "boards/sam/arduino_due_x.h"
+#if defined(ARDUINO_SAM_ZERO)
+#include "boards/samd/arduino_zero.h"
+#elif defined(ARDUINO_SAMD_ZERO)
+#include "boards/samd/arduino_mzero.h"
+#elif defined(ARDUINO_SAMD_MKR1000)
+#include "boards/samd/mkr1000.h"
+#elif defined(ARDUINO_SAMD_MKRZERO)
+#include "boards/samd/mkrzero.h"
+#elif defined(ARDUINO_SAMD_MKRFox1200)
+#include "boards/samd/mkrfox1200.h"
+#elif defined(ARDUINO_SAMD_MKRGSM1400)
+#include "boards/samd/mkrgsm1400.h"
+#elif defined(ARDUINO_SAMD_MKRWAN1300)
+#include "boards/samd/mkrwan1300.h"
+#elif defined(ARDUINO_SAMD_MKRWIFI1010)
+#include "boards/samd/mkrwifi1010.h"
+#elif defined(ARDUINO_SAMD_CIRCUITPLAYGROUND_EXPRESS)
+#include "boards/samd/circuitplay.h"
+#elif defined(ARDUINO_SAMD_TIAN)
+#include "boards/samd/arduino_mzero.h"
 #else
-#warning "Unsupported Arduino SAM variant - falling back to digitalRead and digitalWrite."
+#warning "Unsupported Arduino SAMD variant - falling back to digitalRead and digitalWrite."
 #define DIRECTIO_FALLBACK 1
-#endif 
+#endif
 
 #endif  // _PORTS_SAM_H
