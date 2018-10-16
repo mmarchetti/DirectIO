@@ -24,8 +24,10 @@
 
 #if defined(ARDUINO_ARCH_AVR)
 #include "ports_avr.h"
-#elif defined(ARDUINO_ARCH_SAM) || defined(ARDUINO_ARCH_SAMD)
+#elif defined(ARDUINO_ARCH_SAM)
 #include "ports_sam.h"
+#elif defined(ARDUINO_ARCH_SAMD)
+#include "ports_samd.h"
 #else
 #warning "Unsupported Arduino architecture - falling back to digitalRead and digitalWrite."
 #define DIRECTIO_FALLBACK 1
