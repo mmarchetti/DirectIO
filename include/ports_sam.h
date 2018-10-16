@@ -70,9 +70,9 @@ template <u8 pin> struct _pins {};
         static inline boolean input_read() { return PORT::port_input_read() & mask != 0; } \
         static inline boolean output_write(boolean value) { \
         	if(value) { \
-        		((Pio*)PORT::pio)->PIO_SODR = u32(1) << bit; \
+				((Pio*)PORT::pio)->PIO_SODR = mask; \
     		} else { \
-        		((Pio*)PORT::pio)->PIO_CODR = u32(1) << bit; \
+				((Pio*)PORT::pio)->PIO_CODR = mask; \
 			} \
     	} \
         static inline boolean output_read() { return PORT::port_output_read() & mask != 0; } \
