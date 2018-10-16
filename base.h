@@ -22,7 +22,7 @@
 
 #include <Arduino.h>
 
-#if ARDUINO >= 150
+#if ARDUINO >= 150 && defined(ARDUINO_ARCH_AVR)
 // for u8, u16, u32
 #include <USBAPI.h>
 #else

@@ -25,6 +25,8 @@
 typedef volatile u8* port_t;
 const u8 NO_PIN = 255;
 
+#ifndef DIRECTIO_FALLBACK
+
 template <u8 pin>
 class Input {
     // An standard digital input. read() returns true if the signal is asserted (high).
@@ -58,38 +60,6 @@ class InputPin {
         port_t    in_port;
         u8        mask;
 };
-
-template <u8 pin>
-class InputLow {
-    // An active low digital input. read() returns true if the signal is asserted (low).
-    public:
-        InputLow() {}
-        boolean read() {
-            return ! input.read();
-        }
-        operator boolean() {
-            return read();
-        }
-
-    private:
-        Input<pin> input;
-};
-
-// This macro lets you temporarily set an output to a value,
-// and toggling back at the end of the code block. For example:
-//
-// Output<2> cs;
-// Output<3> data;
-// with(cs, LOW) {
-//     data = HIGH;
-// }
-//
-// is equivalent to:
-// cs = LOW;
-// data = HIGH;
-// cs = HIGH;
-
-#define with(pin, val) for(boolean _loop_##pin=((pin=val),true);_loop_##pin; _loop_##pin=((pin=!val), false))
 
 template <u8 pin>
 class Output {
@@ -151,31 +121,6 @@ class OutputLow {
         }
         boolean read() {
             return !bitRead(*port_t(_pins<pin>::in), _pins<pin>::bit);
-        }
-        operator boolean() {
-            return read();
-        }
-};
-
-template <>
-class Output<NO_PIN> {
-    // This specialization of Output is used when a module supports
-    // an optional pin and that pin is not being used. For example,
-    // if a chip supports an Output Enable pin but it is wired
-    // permanently HIGH in the circuit, there won't be an actual
-    // output pin connected to it. In the software, we will use this
-    // type of Output which is basically a no-op.
-    public:
-        Output(boolean initial_value=LOW) {}
-        void write(boolean value) {}
-        Output& operator =(boolean value) {
-            return *this;
-        }
-        void toggle() {}
-        void pulse(boolean value=HIGH) {}
-
-        boolean read() {
-            return LOW;
         }
         operator boolean() {
             return read();
@@ -344,6 +289,217 @@ class OutputPort<port, 0, 8> {
             return read();
         }
 };
+
+#else // DIRECTIO_FALLBACK
+
+// These classes offer compatilbity with alternate Arduino-compatible devices, so
+// that libraries can depend on DirectIO without limiting portability.
+// These classes delegate to digitalRead and digitalWrite, so they trade off
+// performance for portability.
+template <u8 pin>
+class Input {
+    // An standard digital input. read() returns true if the signal is asserted (high).
+    public:
+        Input(boolean pullup=true) {
+            pinMode(pin, pullup ? INPUT_PULLUP : INPUT);
+        }
+        boolean read() {
+            return digitalRead(pin);
+        }
+        operator boolean() {
+            return read();
+        }
+};
+
+class InputPin {
+    // An digital input where the pin isn't known at compile time.
+    public:
+        InputPin(u8 pin, boolean pullup=true);
+
+        boolean read() {
+            return digitalRead(pin);
+        }
+        operator boolean() {
+            return read();
+        }
+
+    private:
+        u8 pin;
+};
+
+template <u8 pin>
+class Output {
+    // A standard digital output 
+    public:
+        Output(boolean initial_value=LOW) {
+            pinMode(pin, OUTPUT);
+            digitalWrite(pin, initial_value);
+        }
+        void write(boolean value) {
+            digitalWrite(pin, value);
+        }
+        Output& operator =(boolean value) {
+            write(value);
+            return *this;
+        }
+        void toggle() {
+            write(! read());
+        }
+        void pulse(boolean value=HIGH) {
+            write(value);
+            write(! value);
+        }
+        boolean read() {
+            return digitalRead(pin);
+        }
+        operator boolean() {
+            return read();
+        }
+};
+
+template <u8 pin>
+class OutputLow {
+    // An digital output with direct port I/O
+    public:
+        OutputLow(boolean initial_value=HIGH) {
+            pinMode(pin, OUTPUT);
+            digitalWrite(pin, initial_value);
+        }
+        void write(boolean value) {
+            digitalWrite(pin, !value);
+        }
+        OutputLow& operator =(boolean value) {
+            write(value);
+            return *this;
+        }
+        void toggle() {
+            write(! read());
+        }
+        void pulse(boolean value=LOW) {
+            write(value);
+            write(! value);
+        }
+        boolean read() {
+            return !digitalRead(pin);
+        }
+        operator boolean() {
+            return read();
+        }
+};
+
+class OutputPin {
+    // An digital output where the pin isn't known at compile time.
+    // We cache the port address and bit mask for the pin
+    // and write() writes directly to port memory.
+    public:
+        OutputPin(u8 pin, boolean initial_value=LOW);
+
+        void write(boolean value) {
+            digitalWrite(pin, !value);
+        }
+        OutputPin& operator =(boolean value) {
+            write(value);
+            return *this;
+        }
+        void toggle() {
+            write(! read());
+        }
+        void pulse(boolean value=HIGH) {
+            write(value);
+            write(! value);
+        }
+        boolean read() {
+            return digitalRead(pin);
+        }
+        operator boolean() {
+            return read();
+        }
+
+    private:
+        u8 pin;
+};
+
+inline InputPin::InputPin(u8 pin, boolean pullup) :
+    pin(pin)
+{
+    pinMode(pin, pullup ? INPUT_PULLUP : INPUT);
+
+    // include a call to digitalRead here which will
+    // turn off PWM on this pin, if needed
+    (void) digitalRead(pin);
+}
+
+inline OutputPin::OutputPin(u8 pin, boolean initial_state):
+    pin(pin)
+{
+    pinMode(pin, OUTPUT);
+
+    // include a call to digitalWrite here which will
+    // set the initial state and turn off PWM
+    // on this pin, if needed.
+    digitalWrite(pin, initial_state);
+}
+
+#endif // DIRECTIO_FALLBACK
+
+template <u8 pin>
+class InputLow {
+    // An active low digital input. read() returns true if the signal is asserted (low).
+    public:
+        InputLow() {}
+        boolean read() {
+            return ! input.read();
+        }
+        operator boolean() {
+            return read();
+        }
+
+    private:
+        Input<pin> input;
+};
+
+
+// This macro lets you temporarily set an output to a value,
+// and toggling back at the end of the code block. For example:
+//
+// Output<2> cs;
+// Output<3> data;
+// with(cs, LOW) {
+//     data = HIGH;
+// }
+//
+// is equivalent to:
+// cs = LOW;
+// data = HIGH;
+// cs = HIGH;
+
+#define with(pin, val) for(boolean _loop_##pin=((pin=val),true);_loop_##pin; _loop_##pin=((pin=!val), false))
+
+template <>
+class Output<NO_PIN> {
+    // This specialization of Output is used when a module supports
+    // an optional pin and that pin is not being used. For example,
+    // if a chip supports an Output Enable pin but it is wired
+    // permanently HIGH in the circuit, there won't be an actual
+    // output pin connected to it. In the software, we will use this
+    // type of Output which is basically a no-op.
+    public:
+        Output(boolean initial_value=LOW) {}
+        void write(boolean value) {}
+        Output& operator =(boolean value) {
+            return *this;
+        }
+        void toggle() {}
+        void pulse(boolean value=HIGH) {}
+
+        boolean read() {
+            return LOW;
+        }
+        operator boolean() {
+            return read();
+        }
+};
+
 
 template<u8 pin>
 class AnalogInput {
