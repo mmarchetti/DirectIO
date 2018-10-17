@@ -96,34 +96,34 @@ For example, to create an output on pin 2 and turn it on:
 
 ```C++
 Output<2> my_output;
-my_output = HIGH;           	// implicit call to write()
-my_output.write(HIGH);      	// or use an explicit call, if you prefer
+my_output = HIGH;             // implicit call to write()
+my_output.write(HIGH);        // or use an explicit call, if you prefer
 ```
 
 The Output constructor accepts an optional argument `initial_value` specifying the initial state of the output (HIGH or LOW).
 
 ```C++
-Output<2> my_output(HIGH);   	// output should be initially set to HIGH
+Output<2> my_output(HIGH);    // output should be initially set to HIGH
 ```
 
 You can also read the current state of an output - no need to keep a separate state variable. Note that this reads back the value from the I/O port; no additional memory is used.
 
 ```C++
-my_output = ! my_output;		// toggle the output
-my_output = ! my_output.read();	// this works too, if you like explicit calls
-my_output.toggle();				// or use the nice method provided
+my_output = ! my_output;        // toggle the output
+my_output = ! my_output.read(); // this works too, if you like explicit calls
+my_output.toggle();             // or use the nice method provided
 ```
 
 To emit a pulse of minimum duration (2 cycles, or 125 ns on a 16 Mhz board):
 
 ```C++
-my_output.pulse(HIGH);			// set the output HIGH then LOW
+my_output.pulse(HIGH);          // set the output HIGH then LOW
 ```
 
 or
 
 ```C++
-my_output.pulse(LOW);			// set the output LOW then HIGH
+my_output.pulse(LOW);           // set the output LOW then HIGH
 ```
 
 #### Multi-Bit I/O
@@ -180,8 +180,8 @@ void setup()
 
 void loop()
 {
-    u8 value = my_port;           	// implicit call to read()
-    u8 value2 = my_port.read();   	// or use an explicit call, if you prefer
+    u8 value = my_port;             // implicit call to read()
+    u8 value2 = my_port.read();     // or use an explicit call, if you prefer
 }
 ```
 
@@ -206,8 +206,8 @@ void setup()
 
 void loop()
 {
-    my_output = 0x07;           	// implicit call to write()
-    my_output.write(0x07);      	// or use an explicit call, if you prefer
+    my_output = 0x07;             // implicit call to write()
+    my_output.write(0x07);        // or use an explicit call, if you prefer
 }
 ```
 
@@ -225,12 +225,12 @@ Define an active low input on pin 3 and read its value:
 InputLow<3> switch;
 
 if(switch) {
-	// this code will execute when the switch is closed,
-	// and the input voltage is low.
+    // this code will execute when the switch is closed,
+    // and the input voltage is low.
 }
 else {
-	// this code will execute when the switch is open,
-	// and the input voltage is high.
+    // this code will execute when the switch is open,
+    // and the input voltage is high.
 }
 ```
 
@@ -241,14 +241,14 @@ Suppose we have the cathode of an LED connected to pin 2 (the anode would be con
 
 ```C++
 OutputLow<2> led;
-led = true;				// turns on the LED by putting low voltage on pin 2
+led = true;       // turns on the LED by putting low voltage on pin 2
 ```
 
 We could do the same thing with a normal Output if we didn't mind the backward logic:
 
 ```C++
 Output<2> led;
-led = false;			// turns on the LED by putting low voltage on pin 2
+led = false;      // turns on the LED by putting low voltage on pin 2
 ```
 
 #### Pin Numbers Determined at Runtime
@@ -260,8 +260,8 @@ Like the easy to use syntax for reading and writing values, but have a case wher
 ```C++
 boolean DoSomething(u8 pin)
 {
-	InputPin(pin) my_input;		// note pin number is now a constructor parameter
-	return my_input;
+    InputPin(pin) my_input;   // note pin number is now a constructor parameter
+    return my_input;
 }
 ```
 
@@ -272,8 +272,8 @@ boolean DoSomething(u8 pin)
 ```C++
 void DoSomething(u8 pin)
 {
-	OutputPin(pin) my_output;	// note pin number is now a constructor parameter
-	my_output = HIGH;
+    OutputPin(pin) my_output; // note pin number is now a constructor parameter
+    my_output = HIGH;
 }
 ```
 
