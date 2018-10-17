@@ -34,16 +34,29 @@ The standard Arduino I/O library (Wiring) isn't particularly fast. There are sev
 | Because of indirect addressing, digitalWrite must use a multi-instruction read/modify/write sequence. Since this is not atomic, digitalWrite must turn off interrupts and save/restore the status register. | `sbi` and `cbi` instructions execute atomically, so writes don't need to disable interrupts.
 | digitalRead and digitalWrite check/disable PWM on the pin, on every I/O operation. | PWM on the pin is disabled at initialization time.
 
-### Performance (AVR boards)
+### Performance
 
-|                      | Arduino I/O (AVR)          | DirectIO (AVR)            | Arduino I/O (SAM)          | DirectIO (SAM)            |
-| ---------------------|----------------------------|---------------------------|----------------------------|---------------------------|
-| Init Code Size       | 6 bytes per I/O            | 12 bytes per I/O          | 8 bytes per I/O            | 22 bytes per I/O          |
-| Input Code Size      | 6 bytes per read           | 2 bytes per read          | 6 bytes per read           | 8 bytes per read          |
-| Output Code Size     | 6 bytes per write          | 2 bytes to write a constant<br>10 bytes to write a variable value | 6 bytes per write | 8 bytes to write a constant<br>14 bytes to write a variable value |
-| Time to Write Output | >120 cycles                | 2 cycles to write a constant<br>6 to 8 cycles to write a variable value | >170 cycles | ~5 cycles to write a constant<br>~10 cycles to write a variable value |
-| Max Output Frequency | 64 KHz                     | 2.66 MHz                  | 237 KHz                     | 10.5 MHz                 |
-| RAM usage            | none                       | none                      | none                        | none                     |
+#### AVR boards (Nano)
+
+|                      | Arduino I/O (AVR)          | DirectIO (AVR)
+| ---------------------|----------------------------|---------------------------|
+| Init Code Size       | 6 bytes per I/O            | 12 bytes per I/O          |
+| Input Code Size      | 6 bytes per read           | 2 bytes per read          |
+| Output Code Size     | 6 bytes per write          | 2 bytes to write a constant<br>10 bytes to write a variable value |
+| Time to Write Output | >120 cycles                | 2 cycles to write a constant<br>6 to 8 cycles to write a variable value |
+| Max Output Frequency | 64 KHz                     | 2.66 MHz                  |
+| RAM usage            | none                       | none                      |
+
+### SAM boards (Due)
+
+|                      | Arduino I/O (SAM)          | DirectIO (SAM)            |
+| ---------------------|----------------------------|---------------------------|
+| Init Code Size       | 8 bytes per I/O            | 22 bytes per I/O          |
+| Input Code Size      | 6 bytes per read           | 8 bytes per read          |
+| Output Code Size     | 8 bytes to write a constant<br>14 bytes to write a variable value |
+| Time to Write Output | >170 cycles | ~5 cycles to write a constant<br>~10 cycles to write a variable value |
+| Max Output Frequency | 237 KHz                     | 10.5 MHz                 |
+| RAM usage            | none                        | none                     |
 
 ### API
 
