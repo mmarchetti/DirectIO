@@ -65,7 +65,7 @@ template <u8 pin> struct _pins {};
     template <> struct _pins<PIN> : public PORT { \
         static const u8 bit = BIT; \
         static const u32 mask = u32(1) << bit; \
-        static inline boolean input_read() { return PORT::port_input_read() & mask != 0; } \
+        static inline boolean input_read() { return (PORT::port_input_read() & mask) != 0; } \
         static inline boolean output_write(boolean value) { \
             if(value) { \
                ((PortGroup*)port)->OUTSET.reg = mask; \
@@ -73,7 +73,7 @@ template <u8 pin> struct _pins {};
                  ((PortGroup*)port)->OUTCLR.reg = mask; \
             } \
         } \
-        static inline boolean output_read() { return PORT::port_output_read() & mask != 0; } \
+        static inline boolean output_read() { return (PORT::port_output_read() & mask) != 0; } \
     }
 
 #define atomic for(boolean _loop_=(__disable_irq(),true);_loop_; _loop_=(__enable_irq(), false))
