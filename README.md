@@ -354,5 +354,6 @@ ARDUINO_SAMD_ZERO
 ARDUINO_SAM_ZERO
 ```
 
-* Note, STM32, nRF, x86, and other processors are not supported at this time.
-
+Other boards can be used in a fallback mode, with some limitations:
+* DirectIO will not provide any acceleration. Internally, it will call `digitalRead` and `digitalWrite`.
+* `InputPort` and `OutputPort` classes are not defined at this time.
