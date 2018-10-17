@@ -98,6 +98,18 @@ template <u8 pin> struct _pins {};
 #include "boards/samd/circuitplay.h"
 #elif defined(ARDUINO_SAMD_TIAN)
 #include "boards/samd/arduino_mzero.h"
+#elif defined(ARDUINO_SAMD_INDUSTRUINO_D21G)
+#include "boards/samd/industruino_d21g.h"
+#elif defined(ARDUINO_SAMD_SMARTEVERYTHING_DRAGONFLY)
+#include "boards/samd/Dragonfly.h"
+#elif defined(ARDUINO_SAMD_SMARTEVERYTHING_LION)
+#include "boards/samd/Lion.h"
+#elif defined(ARDUINO_SAMD_SMARTEVERYTHING_FOX)
+#if defined(ASME3_REVISION)
+#include "boards/samd/Fox3.h"
+#else
+#include "boards/samd/Fox.h"
+#endif
 #else
 #warning "Unsupported Arduino SAMD variant - falling back to digitalRead and digitalWrite."
 #define DIRECTIO_FALLBACK 1

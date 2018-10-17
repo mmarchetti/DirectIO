@@ -1,5 +1,5 @@
 /*
-  pin.h - AnalogInput and AnalogOutput classes for Arduino.
+  analog.h - AnalogInput and AnalogOutput classes for Arduino.
   Copyright (c) 2015-2018 Michael Marchetti.  All right reserved.
 
   This library is free software; you can redistribute it and/or
