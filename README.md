@@ -36,7 +36,7 @@ The standard Arduino I/O library (Wiring) isn't particularly fast. There are sev
 
 ### Performance (AVR boards)
 
-|                      | Arduino I/O (AVR)          | DirectIO (AVR)            | Arduino I/O (SAM)          | DirectIO (AVR)            |
+|                      | Arduino I/O (AVR)          | DirectIO (AVR)            | Arduino I/O (SAM)          | DirectIO (SAM)            |
 | ---------------------|----------------------------|---------------------------|----------------------------|---------------------------|
 | Init Code Size       | 6 bytes per I/O            | 12 bytes per I/O          | 8 bytes per I/O            | 22 bytes per I/O          |
 | Input Code Size      | 6 bytes per read           | 2 bytes per read          | 6 bytes per read           | 8 bytes per read          |
