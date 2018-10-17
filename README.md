@@ -16,6 +16,7 @@
     * [InputPin](#user-content-inputpin)
     * [OutputPin](#user-content-outputpin)
   * [For Arduino IDE 1.0 Users](#user-content-for-arduino-ide-10-users)
+  * [Supported Boards](#user-content-supported-boards)
 
 ### Why use DirectIO?
 Two reasons: 
@@ -291,6 +292,7 @@ If you omit this step, you will see a warning during compilation, and a standard
 error: #warning "Unsupported Arduino AVR variant. If you are using Arduino IDE 1.0, be sure to #define an Arduino variant (e.g. #define ARDUINO_AVR_UNO 1). See ports.h."
 ```
 
+### Supported Boards
 Supported Arduino variants include boards with AVR, SAM, and SAMD processors.
 
 * AVR board variants:
