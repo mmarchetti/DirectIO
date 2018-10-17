@@ -98,6 +98,8 @@ template <u8 pin> struct _pins {};
 #include "boards/samd/circuitplay.h"
 #elif defined(ARDUINO_SAMD_TIAN)
 #include "boards/samd/arduino_mzero.h"
+#elif defined(ARDUINO_SAMD_ADI)
+#include "boards/samd/adi.h"
 #elif defined(ARDUINO_SAMD_INDUSTRUINO_D21G)
 #include "boards/samd/industruino_d21g.h"
 #elif defined(ARDUINO_SAMD_SMARTEVERYTHING_DRAGONFLY)
