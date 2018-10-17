@@ -53,7 +53,7 @@ The standard Arduino I/O library (Wiring) isn't particularly fast. There are sev
 | ---------------------|----------------------------|---------------------------|
 | Init Code Size       | 8 bytes per I/O            | 22 bytes per I/O          |
 | Input Code Size      | 6 bytes per read           | 8 bytes per read          |
-| Output Code Size     | 8 bytes to write a constant<br>14 bytes to write a variable value |
+| Output Code Size     | 6 bytes per write          | 8 bytes to write a constant<br>14 bytes to write a variable value |
 | Time to Write Output | >170 cycles | ~5 cycles to write a constant<br>~10 cycles to write a variable value |
 | Max Output Frequency | 237 KHz                     | 10.5 MHz                 |
 | RAM usage            | none                        | none                     |
