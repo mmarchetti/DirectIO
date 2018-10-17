@@ -19,7 +19,7 @@
 
 ### Why use DirectIO?
 Two reasons: 
-* Speed: writes are 40x to 60x faster than the Arduino libraries. Maximum output frequency on AVR-based boards is 2.66 MHz, vs 64 KHz for the Arduino libraries. When reading or writing multiple I/O together, even greater performance gains are possible.
+* Speed: on AVR boards, writes are 20x to 60x faster than the Arduino libraries. Maximum output frequency is 2.66 MHz, vs 64 KHz for the Arduino libraries. When reading or writing multiple I/O together, even greater performance gains are possible - over 200x for an 8-bit I/O port. On SAM-based systems (Due), writes are 17-40x faster than the Arduino libraries. Maximum frequency is 10.5 MHz vs. 237 KHz for the Arduino libraries.
 * Simple API: just create pin objects. Assigning to a pin performs a write, using its value performs a read.
 
 ### Comparison
@@ -46,7 +46,9 @@ The standard Arduino I/O library (Wiring) isn't particularly fast. There are sev
 | Max Output Frequency | 64 KHz                     | 2.66 MHz                  |
 | RAM usage            | none                       | none                      |
 
-### SAM boards (Due)
+[Benchmarks](docs/avr_benchmarks.md)
+
+#### SAM boards (Due)
 
 |                      | Arduino I/O (SAM)          | DirectIO (SAM)            |
 | ---------------------|----------------------------|---------------------------|
@@ -56,6 +58,8 @@ The standard Arduino I/O library (Wiring) isn't particularly fast. There are sev
 | Time to Write Output | >170 cycles | ~5 cycles to write a constant<br>~10 cycles to write a variable value |
 | Max Output Frequency | 237 KHz                     | 10.5 MHz                 |
 | RAM usage            | none                        | none                     |
+
+[Benchmarks](docs/arm_benchmarks.md)
 
 ### API
 
