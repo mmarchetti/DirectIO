@@ -169,7 +169,7 @@ void loop() {
 
 ![Trace of 8-bit Arduino port](images/due_direct_port.png)
 
-The low order bit is cycling at 2.4 MHz, so the loop is executing at 4.8MHz. This is around 90x as fast as the native Arduino version.
+The low order bit is cycling at 2.3 MHz, so the loop is executing at 4.6MHz. This is around 85x as fast as the native Arduino version.
 
 ```
    80158: 2300        movs  r3, #0
