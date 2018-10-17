@@ -71,42 +71,73 @@ In order to map the pin numbers you specify into AVR ports, you need to tell the
 
 If you omit this step, you will see a warning during compilation, and a standard Arduino board will be assumed:
 ``` 
-error: #warning "Unsupported Arduino variant. If you are using Arduino IDE 1.0, be sure to #define an Arduino variant (e.g. #define ARDUINO_AVR_UNO 1). See ports.h."
+error: #warning "Unsupported Arduino AVR variant. If you are using Arduino IDE 1.0, be sure to #define an Arduino variant (e.g. #define ARDUINO_AVR_UNO 1). See ports.h."
 ```
 
-There are three supported Arduino variants:
-* Standard board variants:
+Supported Arduino variants include boards with AVR, SAM, and SAMD processors.
+
+* AVR board variants:
 ```
-	ARDUINO_AVR_UNO
-	ARDUINO_AVR_YUN
-	ARDUINO_AVR_DUEMILANOVE
-	ARDUINO_AVR_NANO
-	ARDUINO_AVR_MINI
-	ARDUINO_AVR_ETHERNET
-	ARDUINO_AVR_FIO
-	ARDUINO_AVR_BT
-	ARDUINO_AVR_LILYPAD
-	ARDUINO_AVR_PRO
-	ARDUINO_AVR_NG
+  ARDUINO_AVR_ADK
+  ARDUINO_AVR_ATMEL_ATMEGA168PB_XMINI
+  ARDUINO_AVR_ATMEL_ATMEGA328P_XMINI
+  ARDUINO_AVR_ATMEL_ATMEGA328PB_XMINI
+  ARDUINO_AVR_BT
+  ARDUINO_AVR_CIRCUITPLAY
+  ARDUINO_AVR_DUEMILANOVE
+  ARDUINO_AVR_EMORO_2560
+  ARDUINO_AVR_ESPLORA
+  ARDUINO_AVR_ETHERNET
+  ARDUINO_AVR_ETHERNET
+  ARDUINO_AVR_ETHERNET
+  ARDUINO_AVR_FIO
+  ARDUINO_AVR_GEMMA
+  ARDUINO_AVR_INDUSTRIAL101
+  ARDUINO_AVR_LEONARDO
+  ARDUINO_AVR_LEONARDO_ETH
+  ARDUINO_AVR_LILYPAD
+  ARDUINO_AVR_LILYPAD_USB
+  ARDUINO_AVR_LININO_ONE
+  ARDUINO_AVR_MEGA
+  ARDUINO_AVR_MEGA2560
+  ARDUINO_AVR_MICRO
+  ARDUINO_AVR_MINI
+  ARDUINO_AVR_NANO
+  ARDUINO_AVR_NG
+  ARDUINO_AVR_PRO
+  ARDUINO_AVR_ROBOT_CONTROL
+  ARDUINO_AVR_ROBOT_MOTOR
+  ARDUINO_AVR_UNO
+  ARDUINO_AVR_YUN
+  ARDUINO_AVR_YUNMINI
 ```
 
-* Mega board variants:
+* SAM variants:
+
 ```
-	ARDUINO_AVR_MEGA2560
-	ARDUINO_AVR_ADK
+ARDUINO_SAM_DUE
 ```
 
-* Leonardo board variants:
+* SAMD variants:
+
 ```
-	ARDUINO_AVR_LEONARDO
-	ARDUINO_AVR_MICRO
-	ARDUINO_AVR_ESPLORA
-	ARDUINO_AVR_LILYPAD_USB
-	ARDUINO_AVR_ROBOT_MOTOR
-	ARDUINO_AVR_ROBOT_CONTROL
+ARDUINO_SAMD_CIRCUITPLAYGROUND_EXPRESS
+ARDUINO_SAMD_INDUSTRUINO_D21G
+ARDUINO_SAMD_MKR1000
+ARDUINO_SAMD_MKRFox1200
+ARDUINO_SAMD_MKRGSM1400
+ARDUINO_SAMD_MKRWAN1300
+ARDUINO_SAMD_MKRWIFI1010
+ARDUINO_SAMD_MKRZERO
+ARDUINO_SAMD_SMARTEVERYTHING_DRAGONFLY
+ARDUINO_SAMD_SMARTEVERYTHING_FOX
+ARDUINO_SAMD_SMARTEVERYTHING_LION
+ARDUINO_SAMD_TIAN
+ARDUINO_SAMD_ZERO
+ARDUINO_SAM_ZERO
 ```
 
-*Note, the Arduino Due (ARM platform) isn't supported yet.*
+* Note, STM32, nRF, x86, and other processors are not supported at this time.
 
 #### Input
 
@@ -174,13 +205,13 @@ my_output.pulse(LOW);			// set the output LOW then HIGH
 #### Multi-Bit I/O
 
 The Arduino standard library works hard to hide the implementation details of digital I/O, and presents a nicer API based on pin numbers. But there are advantages to breaking this model:
-* Speed: you can read or write up to 8 pins with a single instruction.
-* Simultaneity: all 8 pins are read or written simultaneously.
+* Speed: you can read or write up to 8 pins with a single instruction (32 pins on SAM and SAMD boards).
+* Simultaneity: all pins are read or written simultaneously.
 
-The DirectIO library provides two classes (`InputPort` and `OutputPort`) that allow port-based I/O, mapping up to 8 bits to a single port object.
+The DirectIO library provides two classes (`InputPort` and `OutputPort`) that allow port-based I/O, mapping part or all of a processor port to a single port object.
 
 1. Determine how many pins you need.
-2. Look at the pinout for your Arduino variant, and identify a set of pins that share a common port and are sequentially numbered in that port. Or, look at the pin definitions in `ports.h`.
+2. Look at the pinout for your Arduino variant, and identify a set of pins that share a common port and are sequentially numbered in that port. Or, look at the pin definitions for your board under `include/boards`.
 3. Wire your project using those pins.
 4. Define an `InputPort` or `OutputPort` object mapped to the selected port and pins. For example, support you are using a 4-bit port and have decided to use Port C2-C5 (in a standard Arduino sketch, these would be referred to as pins 16-19):
 
@@ -189,10 +220,19 @@ The DirectIO library provides two classes (`InputPort` and `OutputPort`) that al
 // This will control C2, C3, C4, C5 (pins 16-19).
 OutputPort<PORT_C, 2, 4> my_port;
 
-// Turn on C2 (pin 16), and turn off the rest.
-my_port = 0x01;
+void setup() 
+{
+    my_port.setup();
+}
+
+void loop()
+{
+    // Turn on C2 (pin 16), and turn off the rest.
+    my_port = 0x01;
+}
 ```
 
+Note the call to `my_port.setup()`; you must call `setup` on each port from your sketch's setup function. This is required for SAM/SAMD boards so that the pin configuration occurs after Arduino initialization.
 
 ##### InputPort
 
@@ -208,11 +248,20 @@ template <class port, u8 start_bit=0, u8 nbits=8> class InputPort { ... }
 Like Input objects, InputPorts support reading values implicitly or explicitly:
 ```
 InputPort<PORT_C, 2, 4> my_port;
-u8 value = my_port;           	// implicit call to read()
-u8 value2 = my_port.read();   	// or use an explicit call, if you prefer
+
+void setup()
+{
+    my_port.setup();
+}
+
+void loop()
+{
+    u8 value = my_port;           	// implicit call to read()
+    u8 value2 = my_port.read();   	// or use an explicit call, if you prefer
+}
 ```
 
-For ports less than 8 bits wide, read() places the bits read from the port into the *n* low order bits of the returned value.
+`read()` places the bits read from the port into the *n* low order bits of the returned value.
 
 ##### OutputPort
 
@@ -225,11 +274,20 @@ template <class port, u8 start_bit=0, u8 nbits=8> class OutputPort { ... }
 Like Output objects, OutputPorts support writing values implicitly or explicitly:
 ```
 OutputPort<PORT_C, 2, 4> my_port;
-my_output = 0x07;           	// implicit call to write()
-my_output.write(0x07);      	// or use an explicit call, if you prefer
+
+void setup()
+{
+    my_port.setup();
+}
+
+void loop()
+{
+    my_output = 0x07;           	// implicit call to write()
+    my_output.write(0x07);      	// or use an explicit call, if you prefer
+}
 ```
 
-For ports less than 8 bits wide, read() places the bits read from the port into the *n* low order bits of the returned value.
+`read()` places the bits read from the port into the *n* low order bits of the returned value.
 
 #### Active Low Signals
 
@@ -283,7 +341,7 @@ boolean DoSomething(u8 pin)
 }
 ```
 
-`InputPin` looks up and caches the port address and bit mask (using 3 bytes of RAM per instance), in order to boost performance over digitalRead.
+`InputPin` looks up and caches the port address and bit mask (using 3 bytes of RAM per instance), in order to boost performance over digitalRead on AVR boards. On SAM/SAMD boards, this class currently delegates to `digitalRead`  so there is no speedup.
 
 ##### OutputPin
 
@@ -295,7 +353,7 @@ void DoSomething(u8 pin)
 }
 ```
 
-`OutputPin` looks up and caches the port address and bit mask (using 8 bytes of RAM per instance), in order to gain a 3x speedup over digitalWrite.
+`OutputPin` looks up and caches the port address and bit mask (using 8 bytes of RAM per instance), in order to gain a 3x speedup over digitalWrite on AVR boards. On SAM/SAMD boards, this class currently delegates to `digitalWrite` so there is no speedup.
 
 ### Benchmarks
 #### Arduino I/O
