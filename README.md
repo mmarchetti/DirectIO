@@ -4,8 +4,6 @@
 * [Comparison](#user-content-comparison)
 * [Performance](#user-content-performance)
 * [API](#user-content-api)
-  * [Include Files](#user-content-include-files)
-  * [For Arduino IDE 1.0 Users](#user-content-for-arduino-ide-10-users)
   * [Input](#user-content-input)
   * [Output](#user-content-output)
   * [Multi-Bit I/O](#user-content-multi-bit-io)
@@ -17,6 +15,7 @@
   * [Pin Numbers Determined at Runtime](#user-content-pin-numbers-determined-at-runtime)
     * [InputPin](#user-content-inputpin)
     * [OutputPin](#user-content-outputpin)
+  * [For Arduino IDE 1.0 Users](#user-content-for-arduino-ide-10-users)
 
 ### Why use DirectIO?
 Two reasons: 
@@ -59,92 +58,6 @@ The standard Arduino I/O library (Wiring) isn't particularly fast. There are sev
 | RAM usage            | none                        | none                     |
 
 ### API
-
-#### Include Files
-When you add the DirectIO library to your project, the Arduino IDE will add all of the include files:
-```C++
-#include <base.h>
-#include <DirectIO.h>
-#include <ports.h>
-```
-Remove `base.h` and `ports.h`, and just include `DirectIO.h`.
-
-#### For Arduino IDE 1.0 Users
-In order to map the pin numbers you specify into AVR ports, you need to tell the Direct IO library which Arduino board type you are using. If you are using Arduino IDE v1.5 or higher, the IDE will do this automatically based on the board selected in the Board menu. If you are using IDE 1.0, you will need to define which board you are using. For example, if you have an Uno board:
-```C++
-#define ARDUINO_AVR_UNO 1
-#include <DirectIO.h>
-```
-
-If you omit this step, you will see a warning during compilation, and a standard Arduino board will be assumed:
-``` 
-error: #warning "Unsupported Arduino AVR variant. If you are using Arduino IDE 1.0, be sure to #define an Arduino variant (e.g. #define ARDUINO_AVR_UNO 1). See ports.h."
-```
-
-Supported Arduino variants include boards with AVR, SAM, and SAMD processors.
-
-* AVR board variants:
-```
-  ARDUINO_AVR_ADK
-  ARDUINO_AVR_ATMEL_ATMEGA168PB_XMINI
-  ARDUINO_AVR_ATMEL_ATMEGA328P_XMINI
-  ARDUINO_AVR_ATMEL_ATMEGA328PB_XMINI
-  ARDUINO_AVR_BT
-  ARDUINO_AVR_CIRCUITPLAY
-  ARDUINO_AVR_DUEMILANOVE
-  ARDUINO_AVR_EMORO_2560
-  ARDUINO_AVR_ESPLORA
-  ARDUINO_AVR_ETHERNET
-  ARDUINO_AVR_ETHERNET
-  ARDUINO_AVR_ETHERNET
-  ARDUINO_AVR_FIO
-  ARDUINO_AVR_GEMMA
-  ARDUINO_AVR_INDUSTRIAL101
-  ARDUINO_AVR_LEONARDO
-  ARDUINO_AVR_LEONARDO_ETH
-  ARDUINO_AVR_LILYPAD
-  ARDUINO_AVR_LILYPAD_USB
-  ARDUINO_AVR_LININO_ONE
-  ARDUINO_AVR_MEGA
-  ARDUINO_AVR_MEGA2560
-  ARDUINO_AVR_MICRO
-  ARDUINO_AVR_MINI
-  ARDUINO_AVR_NANO
-  ARDUINO_AVR_NG
-  ARDUINO_AVR_PRO
-  ARDUINO_AVR_ROBOT_CONTROL
-  ARDUINO_AVR_ROBOT_MOTOR
-  ARDUINO_AVR_UNO
-  ARDUINO_AVR_YUN
-  ARDUINO_AVR_YUNMINI
-```
-
-* SAM variants:
-
-```
-ARDUINO_SAM_DUE
-```
-
-* SAMD variants:
-
-```
-ARDUINO_SAMD_CIRCUITPLAYGROUND_EXPRESS
-ARDUINO_SAMD_INDUSTRUINO_D21G
-ARDUINO_SAMD_MKR1000
-ARDUINO_SAMD_MKRFox1200
-ARDUINO_SAMD_MKRGSM1400
-ARDUINO_SAMD_MKRWAN1300
-ARDUINO_SAMD_MKRWIFI1010
-ARDUINO_SAMD_MKRZERO
-ARDUINO_SAMD_SMARTEVERYTHING_DRAGONFLY
-ARDUINO_SAMD_SMARTEVERYTHING_FOX
-ARDUINO_SAMD_SMARTEVERYTHING_LION
-ARDUINO_SAMD_TIAN
-ARDUINO_SAMD_ZERO
-ARDUINO_SAM_ZERO
-```
-
-* Note, STM32, nRF, x86, and other processors are not supported at this time.
 
 #### Input
 
@@ -361,4 +274,81 @@ void DoSomething(u8 pin)
 ```
 
 `OutputPin` looks up and caches the port address and bit mask (using 8 bytes of RAM per instance), in order to gain a 3x speedup over digitalWrite on AVR boards. On SAM/SAMD boards, this class currently delegates to `digitalWrite` so there is no speedup.
+
+#### For Arduino IDE 1.0 Users
+In order to map the pin numbers you specify into AVR ports, you need to tell the Direct IO library which Arduino board type you are using. If you are using Arduino IDE v1.5 or higher, the IDE will do this automatically based on the board selected in the Board menu. If you are using IDE 1.0, you will need to define which board you are using. For example, if you have an Uno board:
+```C++
+#define ARDUINO_AVR_UNO 1
+#include <DirectIO.h>
+```
+
+If you omit this step, you will see a warning during compilation, and a standard Arduino board will be assumed:
+``` 
+error: #warning "Unsupported Arduino AVR variant. If you are using Arduino IDE 1.0, be sure to #define an Arduino variant (e.g. #define ARDUINO_AVR_UNO 1). See ports.h."
+```
+
+Supported Arduino variants include boards with AVR, SAM, and SAMD processors.
+
+* AVR board variants:
+```
+  ARDUINO_AVR_ADK
+  ARDUINO_AVR_ATMEL_ATMEGA168PB_XMINI
+  ARDUINO_AVR_ATMEL_ATMEGA328P_XMINI
+  ARDUINO_AVR_ATMEL_ATMEGA328PB_XMINI
+  ARDUINO_AVR_BT
+  ARDUINO_AVR_CIRCUITPLAY
+  ARDUINO_AVR_DUEMILANOVE
+  ARDUINO_AVR_EMORO_2560
+  ARDUINO_AVR_ESPLORA
+  ARDUINO_AVR_ETHERNET
+  ARDUINO_AVR_ETHERNET
+  ARDUINO_AVR_ETHERNET
+  ARDUINO_AVR_FIO
+  ARDUINO_AVR_GEMMA
+  ARDUINO_AVR_INDUSTRIAL101
+  ARDUINO_AVR_LEONARDO
+  ARDUINO_AVR_LEONARDO_ETH
+  ARDUINO_AVR_LILYPAD
+  ARDUINO_AVR_LILYPAD_USB
+  ARDUINO_AVR_LININO_ONE
+  ARDUINO_AVR_MEGA
+  ARDUINO_AVR_MEGA2560
+  ARDUINO_AVR_MICRO
+  ARDUINO_AVR_MINI
+  ARDUINO_AVR_NANO
+  ARDUINO_AVR_NG
+  ARDUINO_AVR_PRO
+  ARDUINO_AVR_ROBOT_CONTROL
+  ARDUINO_AVR_ROBOT_MOTOR
+  ARDUINO_AVR_UNO
+  ARDUINO_AVR_YUN
+  ARDUINO_AVR_YUNMINI
+```
+
+* SAM variants:
+
+```
+ARDUINO_SAM_DUE
+```
+
+* SAMD variants:
+
+```
+ARDUINO_SAMD_CIRCUITPLAYGROUND_EXPRESS
+ARDUINO_SAMD_INDUSTRUINO_D21G
+ARDUINO_SAMD_MKR1000
+ARDUINO_SAMD_MKRFox1200
+ARDUINO_SAMD_MKRGSM1400
+ARDUINO_SAMD_MKRWAN1300
+ARDUINO_SAMD_MKRWIFI1010
+ARDUINO_SAMD_MKRZERO
+ARDUINO_SAMD_SMARTEVERYTHING_DRAGONFLY
+ARDUINO_SAMD_SMARTEVERYTHING_FOX
+ARDUINO_SAMD_SMARTEVERYTHING_LION
+ARDUINO_SAMD_TIAN
+ARDUINO_SAMD_ZERO
+ARDUINO_SAM_ZERO
+```
+
+* Note, STM32, nRF, x86, and other processors are not supported at this time.
 
