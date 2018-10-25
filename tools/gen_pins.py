@@ -36,12 +36,14 @@ def read_sam_variant(variant_file):
 
 	with open(variant_file) as f:
 		for line in f.readlines():
+			if line.strip().startswith('//'):
+				continue
 			if sam_pin_declaration_start in line:
 				reading = True
 			elif line.startswith(sam_pin_declaration_end):
 				reading = False
 			elif reading:
-				m = data_re.match(line)
+				m = data_re.search(line)
 				if m:
 					data = m.groups()
 					pins.append((pin_num, data))
@@ -68,7 +70,6 @@ def read_avr_variant(variant_file):
 	port_re = re.compile('\s*P(?:ORT_)?([A-L])')
 	pin_re = re.compile('\s*_BV\(\s*([0-9]+)\s*\)')
 	include_re = re.compile('#include "\.\./([^/]+)/pins_arduino.h"')
-
 
 	with open(variant_file) as f:
 		for line_num, line in enumerate(f.readlines()):
