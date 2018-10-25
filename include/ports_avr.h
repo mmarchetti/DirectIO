@@ -145,7 +145,14 @@ template <u8 pin> struct _pins {};
     defined(ARDUINO_AVR_LILYPAD) || \
     defined(ARDUINO_AVR_PRO) || \
     defined(ARDUINO_AVR_NG) || \
-    defined(AVR_UNO_WIFI_DEV_ED)
+    defined(ARDUINO_AVR_UNO_WIFI_DEV_ED) || \
+    defined(ARDUINO_AVR_FEATHER328P) || \
+    defined(ARDUINO_AVR_METRO) || \
+    defined(ARDUINO_AVR_PROTRINKET3) || \
+    defined(ARDUINO_AVR_PROTRINKET5) || \
+    defined(ARDUINO_AVR_PROTRINKET3FTDI) || \
+    defined(ARDUINO_AVR_PROTRINKET5FTDI)) || \
+    defined(ARDUINO_REDBOT)
 #include "boards/avr/standard.h"
 
 #elif defined(ARDUINO_AVR_MEGA2560) || \
@@ -200,6 +207,57 @@ template <u8 pin> struct _pins {};
 
 #elif defined(ARDUINO_AVR_EMORO_2560)
 #include "boards/avr/emoro_variants.h"
+
+#elif defined(ARDUINO_AVR_FLORA8)
+#include "boards/avr/flora.h"
+
+#elif defined(ARDUINO_AVR_FEATHER32U4)
+#include "boards/avr/feather32u4.h"
+
+#elif defined(ARDUINO_AVR_TRINKET3) || \
+      defined(ARDUINO_AVR_TRINKET3) || \
+#elif defined(ARDUINO_AVR_ITSYBITSY32U4_3V) || \
+      defined(ARDUINO_AVR_ITSYBITSY32U4_5V)
+#include "boards/avr/tiny8.h"
+
+#elif defined(ARDUINO_AVR_BLUEFRUITMICRO)
+#include "boards/avr/bluefruitmicro.h"
+
+#elif defined(ARDUINO_AVR_ADAFRUIT32U4)
+#include "boards/avr/adafruit32u4.h"
+
+#elif defined(ARDUINO_AVR_OLIMEXINO_328)
+#include "boards/avr/Olimexino_328.h"
+
+#elif defined(ARDUINO_AVR_OLIMEXINO_32U4)
+#include "boards/avr/Olimexino_32U4.h"
+
+#elif defined(ARDUINO_AVR_OLIMEXINO_Nano)
+#include "boards/avr/Olimexino_Nano.h"
+
+// #elif defined(ARDUINO_AVR_OLIMEXINO_85)
+// #include "boards/avr/Olimexino_85.h"
+
+// #elif defined(ARDUINO_AVR_RGB_GLASSES)
+// #include "boards/avr/RGB_Glasses.h"
+
+#elif defined(ARDUINO_AVR_MAKEYMAKEY) || \
+      defined(ARDUINO_AVR_PROMICRO) || \
+      defined(ARDUINO_AVR_FIOV3) || \
+      defined(ARDUINO_AVR_QDUINOMINI)
+#include "boards/avr/promicro.h"
+
+#elif defined(ARDUINO_AVR_DIGITAL_SANDBOX)
+#include "boards/avr/digitalsandbox.h"
+
+#elif defined(ARDUINO_AVR_SERIAL_7_SEGMENT)
+#include "boards/avr/ser7seg.h"
+
+#elif defined(ARDUINO_ATMEGA128RFA1_DEV_BOARD)
+#include "boards/avr/rf128.h"
+
+#elif defined(ARDUINO_AVR_LILYPAD_ARDUINO_USB_PLUS_BOARD)
+#include "boards/avr/lilypadusbplus.h"
 
 #else
 #warning "Unsupported Arduino AVR variant - falling back to digitalRead and digitalWrite. If you are using Arduino IDE 1.0, be sure to #define an Arduino variant (e.g. #define ARDUINO_AVR_UNO 1). See ports.h."
