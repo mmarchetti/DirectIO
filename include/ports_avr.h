@@ -235,11 +235,11 @@ template <u8 pin> struct _pins {};
 #elif defined(ARDUINO_AVR_OLIMEXINO_Nano)
 #include "boards/avr/Olimexino_Nano.h"
 
-// #elif defined(ARDUINO_AVR_OLIMEXINO_85)
-// #include "boards/avr/Olimexino_85.h"
+#elif defined(ARDUINO_AVR_OLIMEXINO_85)
+#include "boards/avr/Olimexino_85.h"
 
-// #elif defined(ARDUINO_AVR_RGB_GLASSES)
-// #include "boards/avr/RGB_Glasses.h"
+#elif defined(ARDUINO_AVR_RGB_GLASSES)
+#include "boards/avr/RGB_Glasses.h"
 
 #elif defined(ARDUINO_AVR_MAKEYMAKEY) || \
       defined(ARDUINO_AVR_PROMICRO) || \
