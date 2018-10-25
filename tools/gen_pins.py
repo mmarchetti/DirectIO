@@ -65,7 +65,7 @@ def read_avr_variant(variant_file):
 	ports = []
 	pins = []
 	pin_num = 0
-	port_re = re.compile('\s*P([A-L])')
+	port_re = re.compile('\s*P(?:ORT_)?([A-L])')
 	pin_re = re.compile('\s*_BV\(\s*([0-9]+)\s*\)')
 	include_re = re.compile('#include "\.\./([^/]+)/pins_arduino.h"')
 
@@ -99,7 +99,7 @@ def read_avr_variant(variant_file):
 					print('%s -> %s' % (variant_file, m.group()))
 
 		if len(ports) != len(pins):
-			error('ports/pins mismatch in %s' % variant_file)
+			error('ports/pins mismatch in %s (%d ports, %d pins)' % (variant_file, len(ports), len(pins)))
 			return []
 
 		if not pins and not found_include:
@@ -141,7 +141,7 @@ def main(argv):
 	pattern = join(base_path, 'packages', '*', 'hardware', 'sam*', '*', 'variants', '*', 'variant.cpp')
 	variants.update({v: read_sam_variant(v) for v in glob(pattern)})
 
-	pattern = join(base_path, 'packages', '*', 'hardware', 'avr', '*', 'variants', '*', 'pins_arduino.h')
+	pattern = join(base_path, 'packages', '*', 'hardware', 'avr', '*', 'variants', '*', 'pins_arduino.*')
 	variants.update({v: read_avr_variant(v) for v in glob(pattern)})
 
 	for path, pins in variants.items():
