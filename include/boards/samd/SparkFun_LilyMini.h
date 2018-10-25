@@ -12,4 +12,4 @@ _define_pin(8, PORT_A, 2);
 _define_pin(9, PORT_A, 24);
 _define_pin(10, PORT_A, 25);
 _define_pin(11, PORT_A, 5);
-_define_pin(12, PORT_A, 30);
+_define_pin(13, PORT_A, 30);
