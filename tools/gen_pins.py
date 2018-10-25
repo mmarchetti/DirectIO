@@ -32,7 +32,8 @@ def read_sam_variant(variant_file):
 	reading = False
 	pins = []
 	pin_num = 0
-	data_re = re.compile('\s*\{\s*(?:PORT|PIO)([A-L]),\s+(?:PIO_P[A-F])?([0-9]+)')
+	pin_re = re.compile('{(.*)}')
+	data_re = re.compile('\s*(?:PORT|PIO)([A-L]),\s*(?:PIO_P[A-F])?([0-9]+)')
 
 	with open(variant_file) as f:
 		for line in f.readlines():
@@ -43,10 +44,16 @@ def read_sam_variant(variant_file):
 			elif line.startswith(sam_pin_declaration_end):
 				reading = False
 			elif reading:
-				m = data_re.search(line)
+				# first look for the brackets, which indicate pin data
+				# then look for the port/pin info contained within.
+				# Some SAMD variants have empty brackets which indicate a
+				# pin number that cannot be used.
+				m = pin_re.search(line)
 				if m:
-					data = m.groups()
-					pins.append((pin_num, data))
+					data = m.group(1)
+					m = data_re.match(data)
+					if m:
+						pins.append((pin_num, m.groups()))
 					pin_num += 1
 
 	if not pins:
