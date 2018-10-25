@@ -65,12 +65,13 @@ def read_avr_variant(variant_file):
 	ports = []
 	pins = []
 	pin_num = 0
-	port_re = re.compile('\sP([A-L])')
-	pin_re = re.compile('\s_BV\(\s*([0-9]+)\s*\)')
+	port_re = re.compile('\s*P([A-L])')
+	pin_re = re.compile('\s*_BV\(\s*([0-9]+)\s*\)')
 	include_re = re.compile('#include "\.\./([^/]+)/pins_arduino.h"')
 
+
 	with open(variant_file) as f:
-		for line in f.readlines():
+		for line_num, line in enumerate(f.readlines()):
 			if reading_ports:
 				if line.startswith(avr_declaration_end):
 					reading_ports = False
