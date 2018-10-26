@@ -187,12 +187,6 @@ template <u8 pin> struct _pins {};
       defined(ARDUINO_AVR_LININO_ONE)
 #include "boards/avr/yun.h"
 
-#elif defined(ARDUINO_AVR_ETHERNET)
-#include "boards/avr/ethernet.h"
-
-#elif defined(ARDUINO_AVR_ETHERNET)
-#include "boards/avr/ethernet.h"
-
 #elif defined(ARDUINO_AVR_CIRCUITPLAY)
 #include "boards/avr/circuitplay32u4.h"
 
@@ -215,7 +209,7 @@ template <u8 pin> struct _pins {};
 #include "boards/avr/feather32u4.h"
 
 #elif defined(ARDUINO_AVR_TRINKET3) || \
-      defined(ARDUINO_AVR_TRINKET3) || \
+      defined(ARDUINO_AVR_TRINKET5) || \
       defined(ARDUINO_AVR_ITSYBITSY32U4_3V) || \
       defined(ARDUINO_AVR_ITSYBITSY32U4_5V)
 #include "boards/avr/tiny8.h"
