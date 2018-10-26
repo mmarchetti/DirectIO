@@ -151,7 +151,7 @@ template <u8 pin> struct _pins {};
     defined(ARDUINO_AVR_PROTRINKET3) || \
     defined(ARDUINO_AVR_PROTRINKET5) || \
     defined(ARDUINO_AVR_PROTRINKET3FTDI) || \
-    defined(ARDUINO_AVR_PROTRINKET5FTDI)) || \
+    defined(ARDUINO_AVR_PROTRINKET5FTDI) || \
     defined(ARDUINO_REDBOT)
 #include "boards/avr/standard.h"
 
@@ -216,7 +216,7 @@ template <u8 pin> struct _pins {};
 
 #elif defined(ARDUINO_AVR_TRINKET3) || \
       defined(ARDUINO_AVR_TRINKET3) || \
-#elif defined(ARDUINO_AVR_ITSYBITSY32U4_3V) || \
+      defined(ARDUINO_AVR_ITSYBITSY32U4_3V) || \
       defined(ARDUINO_AVR_ITSYBITSY32U4_5V)
 #include "boards/avr/tiny8.h"
 
