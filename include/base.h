@@ -26,9 +26,9 @@ typedef unsigned char  u8;
 typedef unsigned short u16;
 typedef unsigned long  u32;
 
-typedef int8_t  i8;
-typedef int16_t i16;
-typedef int32_t i32;
+typedef char  i8;
+typedef short i16;
+typedef long  i32;
 
 // Define std C++ style "<<" operator for writing to output streams.
 template<class T> inline Print &operator << (Print& obj, T arg)
