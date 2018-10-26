@@ -22,6 +22,11 @@
 
 #include "include/ports.h"
 
+#ifndef INPUT_PULLUP
+// for boards that don't support pullups
+#define INPUT_PULLUP INPUT
+#endif
+
 const u8 NO_PIN = 255;
 #include "include/pin.h"
 #include "include/analog.h"
