@@ -78,6 +78,9 @@ def read_avr_variant(variant_file):
 	pin_re = re.compile('\s*_BV\(\s*([0-9]+)\s*\)')
 	include_re = re.compile('#include "\.\./([^/]+)/pins_arduino.h"')
 
+	if variant_file.endswith('pins_arduino.c'):
+		print('Warning: check generated pins for %s; multiple MCU variants may be combined' % variant_file)
+
 	with open(variant_file) as f:
 		for line_num, line in enumerate(f.readlines()):
 			if reading_ports:
