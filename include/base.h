@@ -22,14 +22,9 @@
 
 #include <Arduino.h>
 
-#if ARDUINO >= 150 && defined(ARDUINO_ARCH_AVR)
-// for u8, u16, u32
-#include <USBAPI.h>
-#else
-typedef uint8_t  u8;
-typedef uint16_t u16;
-typedef uint32_t u32;
-#endif
+typedef unsigned char  u8;
+typedef unsigned short u16;
+typedef unsigned long  u32;
 
 typedef int8_t  i8;
 typedef int16_t i16;
