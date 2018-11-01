@@ -346,13 +346,13 @@ class Output<NO_PIN> {
     // output pin connected to it. In the software, we will use this
     // type of Output which is basically a no-op.
     public:
-        Output(boolean initial_value=LOW) {}
-        void write(boolean value) {}
-        Output& operator =(boolean value) {
+        Output(boolean /*initial_value*/=LOW) {}
+        void write(boolean /*value*/) {}
+        Output& operator =(boolean /*value*/) {
             return *this;
         }
         void toggle() {}
-        void pulse(boolean value=HIGH) {}
+        void pulse(boolean /*value*/=HIGH) {}
 
         boolean read() {
             return LOW;
