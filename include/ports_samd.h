@@ -66,7 +66,7 @@ template <u8 pin> struct _pins {};
         static const u8 bit = BIT; \
         static const u32 mask = u32(1) << bit; \
         static inline boolean input_read() { return (PORT::port_input_read() & mask) != 0; } \
-        static inline boolean output_write(boolean value) { \
+        static inline void output_write(boolean value) { \
             if(value) { \
                 PORT::port_output_set(mask); \
             } else { \

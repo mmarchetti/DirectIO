@@ -126,7 +126,7 @@ template <u8 pin> struct _pins {};
     template <> struct _pins<PIN> : public PORT { \
         static const u8 bit = BIT; \
         static inline boolean input_read() { return bitRead(*port_t(in), bit); } \
-        static inline boolean output_write(boolean value) { bitWrite(*port_t(out), bit, value); } \
+        static inline void output_write(boolean value) { bitWrite(*port_t(out), bit, value); } \
         static inline boolean output_read() { return bitRead(*port_t(in), bit); } \
     }
 
