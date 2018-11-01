@@ -1,0 +1,36 @@
+// DirectIO support for feather_m4
+
+_define_pin(0, PORT_B, 17);
+_define_pin(1, PORT_B, 16);
+_define_pin(4, PORT_A, 14);
+_define_pin(5, PORT_A, 16);
+_define_pin(6, PORT_A, 18);
+_define_pin(8, PORT_B, 3);
+_define_pin(9, PORT_A, 19);
+_define_pin(10, PORT_A, 20);
+_define_pin(11, PORT_A, 21);
+_define_pin(12, PORT_A, 22);
+_define_pin(13, PORT_A, 23);
+_define_pin(14, PORT_A, 2);
+_define_pin(15, PORT_A, 5);
+_define_pin(16, PORT_B, 8);
+_define_pin(17, PORT_B, 9);
+_define_pin(18, PORT_A, 4);
+_define_pin(19, PORT_A, 6);
+_define_pin(20, PORT_B, 1);
+_define_pin(21, PORT_A, 12);
+_define_pin(22, PORT_A, 13);
+_define_pin(23, PORT_B, 22);
+_define_pin(24, PORT_B, 23);
+_define_pin(25, PORT_A, 17);
+_define_pin(29, PORT_A, 24);
+_define_pin(30, PORT_A, 27);
+_define_pin(31, PORT_A, 3);
+_define_pin(32, PORT_A, 2);
+_define_pin(33, PORT_A, 5);
+_define_pin(34, PORT_B, 10);
+_define_pin(35, PORT_B, 11);
+_define_pin(36, PORT_A, 8);
+_define_pin(37, PORT_A, 9);
+_define_pin(38, PORT_A, 10);
+_define_pin(39, PORT_A, 11);

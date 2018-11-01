@@ -22,18 +22,13 @@
 
 #include <Arduino.h>
 
-#if ARDUINO >= 150 && defined(ARDUINO_ARCH_AVR)
-// for u8, u16, u32
-#include <USBAPI.h>
-#else
-typedef uint8_t  u8;
-typedef uint16_t u16;
-typedef uint32_t u32;
-#endif
+typedef unsigned char  u8;
+typedef unsigned short u16;
+typedef unsigned long  u32;
 
-typedef int8_t  i8;
-typedef int16_t i16;
-typedef int32_t i32;
+typedef char  i8;
+typedef short i16;
+typedef long  i32;
 
 // Define std C++ style "<<" operator for writing to output streams.
 template<class T> inline Print &operator << (Print& obj, T arg)
