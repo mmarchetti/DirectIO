@@ -47,7 +47,7 @@ The standard Arduino I/O library (Wiring) isn't particularly fast. There are sev
 | Max Output Frequency | 64 KHz                     | 2.66 MHz                  |
 | RAM usage            | none                       | none                      |
 
-[Benchmarks](docs/avr_benchmarks.md)
+[Benchmarks](extras/docs/avr_benchmarks.md)
 
 #### SAM boards (Due)
 
@@ -60,7 +60,7 @@ The standard Arduino I/O library (Wiring) isn't particularly fast. There are sev
 | Max Output Frequency | 237 KHz                     | 10.5 MHz                 |
 | RAM usage            | none                        | none                     |
 
-[Benchmarks](docs/arm_benchmarks.md)
+[Benchmarks](extras/docs/arm_benchmarks.md)
 
 ### API
 
