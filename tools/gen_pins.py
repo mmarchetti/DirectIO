@@ -76,7 +76,7 @@ def read_avr_variant(variant_file):
 	pin_num = 0
 	port_re = re.compile('\s*P(?:ORT_)?([A-L])')
 	pin_re = re.compile('\s*_BV\(\s*([0-9]+)\s*\)')
-	include_re = re.compile('#include "\.\./([^/]+)/pins_arduino.h"')
+	include_re = re.compile('#include "(\.\./[^/]+/pins_arduino.h)"')
 
 	if variant_file.endswith('pins_arduino.c'):
 		print('Warning: check generated pins for %s; multiple MCU variants may be combined' % variant_file)
@@ -107,7 +107,9 @@ def read_avr_variant(variant_file):
 				m = include_re.match(line)
 				if m:
 					found_include = True
-					print('%s -> %s' % (variant_file, m.group()))
+					target = m.group(1)
+					print('%s -> %s' % (variant_file, target))
+					return read_avr_variant(join(dirname(variant_file), target))
 
 		if len(ports) != len(pins):
 			error('ports/pins mismatch in %s (%d ports, %d pins)' % (variant_file, len(ports), len(pins)))
