@@ -309,7 +309,7 @@ template <u8 pin>
 class InputLow {
     // An active low digital input. read() returns true if the signal is asserted (low).
     public:
-        InputLow() {}
+        InputLow(boolean pullup=true) : input(pullup) {}
         boolean read() {
             return ! input.read();
         }
