@@ -23,7 +23,7 @@ class InputPin {
     // We cache the port address and bit mask for the pin
     // and read() reads directly from port memory.
     public:
-        InputPin(u8 pin, boolean pullup=true);
+        explicit InputPin(u8 pin, boolean pullup=true);
 
         boolean read() {
             return (*in_port & mask) != 0;
@@ -42,7 +42,7 @@ class OutputPin {
     // We cache the port address and bit mask for the pin
     // and write() writes directly to port memory.
     public:
-        OutputPin(u8 pin, boolean initial_value=LOW);
+        explicit OutputPin(u8 pin, boolean initial_value=LOW);
 
         void write(boolean value);
         OutputPin& operator =(boolean value) {
