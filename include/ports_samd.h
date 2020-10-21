@@ -142,10 +142,10 @@ template <u8 pin> struct _pins {};
 #include "boards/samd/gemma_m0.h"
 #elif defined(ARDUINO_TRINKET_M0)
 #include "boards/samd/trinket_m0.h"
-#elif defined(ARDUINO_ITSYBITSY_M4)
+#elif defined(ARDUINO_ITSYBITSY_M0)
 #include "boards/samd/itsybitsy_m0.h"
 #elif defined(ARDUINO_ITSYBITSY_M4)
-#include "boards/samd/itsybitsy_m0.h"
+#include "boards/samd/itsybitsy_m4.h"
 #elif defined(ARDUINO_SAMD_HALLOWING)
 #include "boards/samd/hallowing_m0_express.h"
 #elif defined(ARDUINO_PIRKEY)
