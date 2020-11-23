@@ -160,6 +160,10 @@ template <u8 pin> struct _pins {};
       defined(ARDUINO_AVR_ADK)
 #include "boards/avr/mega.h"
 
+#elif defined(ARDUINO_AVR_ATmega2561) || \
+	  defined(ARDUINO_AVR_ATmega1281)
+#include "boards/avr/megacore64.h"
+
 #elif defined(ARDUINO_AVR_LEONARDO) || \
       defined(ARDUINO_AVR_LEONARDO_ETH) || \
       defined(ARDUINO_AVR_ESPLORA) || \
