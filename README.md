@@ -261,7 +261,7 @@ Like the easy to use syntax for reading and writing values, but have a case wher
 ```C++
 boolean DoSomething(u8 pin)
 {
-    InputPin(pin) my_input;   // note pin number is now a constructor parameter
+    InputPin my_input(pin);   // note pin number is now a constructor parameter
     return my_input;
 }
 ```
@@ -273,7 +273,7 @@ boolean DoSomething(u8 pin)
 ```C++
 void DoSomething(u8 pin)
 {
-    OutputPin(pin) my_output; // note pin number is now a constructor parameter
+    OutputPin my_output(pin); // note pin number is now a constructor parameter
     my_output = HIGH;
 }
 ```
